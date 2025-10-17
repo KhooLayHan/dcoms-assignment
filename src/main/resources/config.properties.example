@@ -1,8 +1,8 @@
 # MySQL Database Connection
 db.connection=mysql
 db.driver=jdbc
-db.user=user
-db.password=password
+db.user=
+db.password=
 db.host=localhost
 db.port=3306
-db.name=hrm_db
+db.name=
