@@ -19,7 +19,7 @@ public class Server extends UnicastRemoteObject implements Service {
     public String registerEmployee(String firstName, String lastName, String icPassport) throws RemoteException {
         logger.info("Client requested to register employees: {}", firstName);
 
-//         TODO: Will need to implement calling the DatabaseManager when saving the employee.
+        // TODO: Will need to implement calling the DatabaseManager when saving the employee.
         return "";
     }
 
