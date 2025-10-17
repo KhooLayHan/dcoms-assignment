@@ -1,4 +1,51 @@
 package org.bhel.hrm.server;
 
-public class DatabaseManager {
+import org.bhel.hrm.server.config.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public final class DatabaseManager {
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
+    private static Configuration configuration;
+
+    // jdbc:mysql://localhost:3306/hrm_db?useSSL=false&serverTimezone=UTC
+    private static final String DATABASE_URL = String.format("{%s}:{%s}://{%s}:{%s}/{%s}?useSSL=false&serverTimezone=UTC",
+        configuration.getDbDriver(),
+        configuration.getDbConnection(),
+        configuration.getDbHost(),
+        configuration.getDbPort(),
+        configuration.getDbName()
+    );
+
+    private static final String DB_USER = configuration.getDbUser();
+    private static final String DB_PASSWORD = configuration.getDbPassword();
+
+    private DatabaseManager() {
+        throw new UnsupportedOperationException("Utility class");
+    }
+
+    public static void setConfiguration(Configuration config) {
+        configuration = config;
+    }
+
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(DATABASE_URL, DB_USER, DB_PASSWORD);
+    }
+
+    public static void initializeDatabase() {
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
+            String sql = "";
+
+            stmt.execute(sql);
+            logger.info("Database connection successful. 'employees' table is ready.");
+        } catch (SQLException e) {
+            logger.error("FATAL: Database initialization failed!");
+            logger.error(e.toString());
+        }
+    }
 }
