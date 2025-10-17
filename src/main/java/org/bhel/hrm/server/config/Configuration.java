@@ -1,4 +1,62 @@
 package org.bhel.hrm.server.config;
 
+import org.bhel.hrm.server.ServerLauncher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 public class Configuration {
+    private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
+
+    private final Properties properties;
+
+    public Configuration() throws ConfigurationException {
+        properties = new Properties();
+
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+            if (input == null) {
+                logger.warn("Sorry");
+                throw new IOException("File config.properties is not found in classpath.");
+            }
+
+            properties.load(input);
+        } catch (IOException e) {
+            throw new ConfigurationException("Failed to load configuration." + e.getMessage(), e);
+        }
+    }
+
+    public String getDbUrl() {
+        return properties.getProperty("db.url");
+    }
+
+    public String getDbConnection() {
+        return properties.getProperty("db.connection");
+    }
+
+    public String getDbDriver() {
+        return properties.getProperty("db.jdbc");
+    }
+
+    public String getDbUser() {
+        return properties.getProperty("db.user");
+    }
+
+    public String getDbPassword() {
+        return properties.getProperty("db.password");
+    }
+
+    public String getDbHost() {
+        return properties.getProperty("db.host");
+    }
+
+    public String getDbPort() {
+        return properties.getProperty("db.port");
+    }
+
+    public String getDbName() {
+        return properties.getProperty("db.name");
+    }
 }
