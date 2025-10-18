@@ -39,7 +39,13 @@ public final class DatabaseManager {
 
     public static void initializeDatabase() {
         try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
-            String sql = "";
+            String sql =
+                "CREATE TABLE IF NOT EXISTS employees (" +
+                "id INT AUTO_INCREMENT PRIMARY_KEY, " +
+                "first_name VARCHAR(255) NOT NULL," +
+                "last_name VARCHAR(255) NOT NULL," +
+                "ic_passport VARCHAR(255) UNIQUE NOT NULL" +
+                ")";
 
             stmt.execute(sql);
             logger.info("Database connection successful. 'employees' table is ready.");
