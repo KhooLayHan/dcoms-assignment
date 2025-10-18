@@ -1,7 +1,6 @@
 package org.bhel.hrm.common.services;
 
 import org.bhel.hrm.common.dtos.EmployeeDTO;
-import org.bhel.hrm.common.models.Employee;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
