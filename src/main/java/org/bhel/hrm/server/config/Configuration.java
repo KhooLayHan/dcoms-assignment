@@ -1,6 +1,5 @@
 package org.bhel.hrm.server.config;
 
-import org.bhel.hrm.server.ServerLauncher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,16 +27,12 @@ public class Configuration {
         }
     }
 
-    public String getDbUrl() {
-        return properties.getProperty("db.url");
-    }
-
     public String getDbConnection() {
         return properties.getProperty("db.connection");
     }
 
     public String getDbDriver() {
-        return properties.getProperty("db.jdbc");
+        return properties.getProperty("db.driver");
     }
 
     public String getDbUser() {
