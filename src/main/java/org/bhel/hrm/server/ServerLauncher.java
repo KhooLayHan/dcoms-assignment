@@ -1,27 +1,34 @@
 package org.bhel.hrm.server;
 
-import org.bhel.hrm.common.services.Service;
+import org.bhel.hrm.common.services.IService;
+import org.bhel.hrm.server.config.Configuration;
+import org.bhel.hrm.server.daos.EmployeeDAO;
+import org.bhel.hrm.server.daos.IEmployeeDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ServerLauncher {
     private static final Logger logger = LoggerFactory.getLogger(ServerLauncher.class);
 
     public static void main(String[] args) {
-        DatabaseManager.initializeDatabase();
-
-        logger.info("HRM Server is starting up...");
-
         try {
-            Server server = new Server();
+            logger.info("HRM Server is starting up...");
+
+            Configuration configuration = new Configuration();
+
+            @SuppressWarnings("java:S2440")
+            DatabaseManager databaseManager = new DatabaseManager(configuration);
+
+            EmployeeDAO employeeDAO = new EmployeeDAO(databaseManager);
+
+            Server server = new Server(employeeDAO);
 
             Registry registry = LocateRegistry.createRegistry(1099);
 
-            registry.rebind(Service.SERVICE_NAME, server);
+            registry.rebind(IService.SERVICE_NAME, server);
 
             logger.info("Server is running and waiting for client connections...");
        } catch (Exception e) {
