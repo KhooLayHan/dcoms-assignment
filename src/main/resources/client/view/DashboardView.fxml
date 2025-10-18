@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.bhel.hrm.client.controllers.DashboardController">
+    <top>
+        <Label text="HR Management Dashboard" BorderPane.alignment="CENTER">
+            <font><Font name="System Bold" size="24.0" /></font>
+            <padding><Insets top="10" right="10" bottom="20" left="10" /></padding>
+        </Label>
+    </top>
+    <center>
+        <TableView fx:id="employeeDTOTableView">
+            <columns>
+                <TableColumn text="Employee ID" />
+                <TableColumn text="First Name" />
+                <TableColumn text="Last Name" />
+                <TableColumn text="IC/Passport" />
+            </columns>
+        </TableView>
+    </center>
+    <right>
+        <VBox spacing="10" alignment="TOP_CENTER">
+            <padding><Insets top="10" right="10" bottom="10" left="20" /></padding>
+            <Button text="Add Employee" onAction="#handleAddEmployeeAction" maxWidth="Infinity"/>
+            <Button text="Edit Selected" maxWidth="Infinity"/>
+            <Button text="Generate Report" maxWidth="Infinity"/>
+        </VBox>
+    </right>
+</BorderPane>
