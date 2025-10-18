@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IEmployeeDAO {
-    void save(Employee employee);
-
     Optional<Employee> findById(int id);
 
     List<Employee> findAll();
+
+    void save(Employee employee);
+
 }
