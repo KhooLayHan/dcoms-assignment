@@ -22,7 +22,7 @@ public final class DatabaseManager {
 
     public Connection getConnection() throws SQLException {
         // jdbc:mysql://localhost:3306/hrm_db?useSSL=false&serverTimezone=UTC
-        final String DATABASE_URL = String.format("{%s}:{%s}://{%s}:{%s}/{%s}?useSSL=false&serverTimezone=UTC",
+        final String DATABASE_URL = String.format("%s:%s://%s:%s/%s?useSSL=false&serverTimezone=UTC",
             configuration.getDbDriver(),
             configuration.getDbConnection(),
             configuration.getDbHost(),
@@ -40,7 +40,7 @@ public final class DatabaseManager {
         try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
             String sql = """
                 CREATE TABLE IF NOT EXISTS employees (
-                    id INT AUTO_INCREMENT PRIMARY_KEY,
+                    id INT AUTO_INCREMENT PRIMARY KEY,
                     first_name VARCHAR(255) NOT NULL,
                     last_name VARCHAR(255) NOT NULL,
                     ic_passport VARCHAR(255) UNIQUE NOT NULL

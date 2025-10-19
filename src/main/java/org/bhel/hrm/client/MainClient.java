@@ -18,7 +18,7 @@ public class MainClient extends Application {
 //        primaryStage.setScene(new Scene(root));
 //        primaryStage.show();
 
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("view/DashboardView.fxml")));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/client/view/DashboardView.fxml")));
         primaryStage.setTitle("BHEL – Human Resource Management");
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.show();
