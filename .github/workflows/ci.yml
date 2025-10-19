@@ -36,7 +36,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
-          cache-dependency-path: 'human-resource-management/pom.xml'
+          cache-dependency-path: 'pom.xml'
 
       - name: Build with Maven
         # The 'mvn verify' command compiles, runs tests, and packages the app.
