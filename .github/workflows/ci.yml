@@ -43,7 +43,7 @@ jobs:
         # We provide the database credentials as environment variables.
         # The host 'mysql' is automatically available because of the 'services' block.
         run: >
-          mvn -B --upload-snapshots verify
+          mvn -B --update-snapshots verify
         env:
           DB_URL: jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/hrm_db
           DB_USER: user
