@@ -1,0 +1,58 @@
+name: Java CI with Maven and MySQL
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:9.0.4
+        env:
+          MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+          MYSQL_ONETIME_PASSWORD: 'yes'
+          MYSQL_DATABASE: hrm_db
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+        # Health check to ensure the job doesn't start until MySQL is ready to accept connections.
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+          cache-dependency-path: 'human-resource-management/pom.xml'
+
+      - name: Build with Maven
+        # The 'mvn verify' command compiles, runs tests, and packages the app.
+        # We provide the database credentials as environment variables.
+        # The host 'mysql' is automatically available because of the 'services' block.
+        run: >
+          mvn -B --upload-snapshots verify
+        env:
+          DB_URL: jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/hrm_db
+          DB_USER: user
+          DB_PASSWORD: password
+
+      # Uploads the packaged JARs as build artifacts.
+      - name: Upload JAR Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hrm-application-jars
+          # This will find any JAR files in the 'target' directory and upload them.
+          path: target/*.jar
