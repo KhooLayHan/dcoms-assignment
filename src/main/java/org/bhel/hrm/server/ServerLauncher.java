@@ -1,6 +1,6 @@
 package org.bhel.hrm.server;
 
-import org.bhel.hrm.common.services.IService;
+import org.bhel.hrm.common.services.HRMService;
 import org.bhel.hrm.server.config.Configuration;
 import org.bhel.hrm.server.daos.EmployeeDAO;
 
@@ -28,7 +28,7 @@ public class ServerLauncher {
 
             Registry registry = LocateRegistry.createRegistry(1099);
 
-            registry.rebind(IService.SERVICE_NAME, server);
+            registry.rebind(HRMService.SERVICE_NAME, server);
 
             logger.info("Server is running and waiting for client connections...");
        } catch (Exception e) {

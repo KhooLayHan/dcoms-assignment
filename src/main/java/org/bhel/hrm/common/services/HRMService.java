@@ -6,7 +6,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-public interface IService extends Remote {
+public interface HRMService extends Remote {
     // Must be a unique name to reference the service from the RMI registry.
     String SERVICE_NAME = "HRMService";
 

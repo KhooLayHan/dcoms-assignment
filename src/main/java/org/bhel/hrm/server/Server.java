@@ -1,7 +1,7 @@
 package org.bhel.hrm.server;
 
 import org.bhel.hrm.common.dtos.EmployeeDTO;
-import org.bhel.hrm.common.services.IService;
+import org.bhel.hrm.common.services.HRMService;
 import org.bhel.hrm.server.daos.EmployeeDAO;
 import org.bhel.hrm.server.domain.Employee;
 import org.bhel.hrm.server.mapper.EmployeeMapper;
@@ -13,7 +13,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-public class Server extends UnicastRemoteObject implements IService {
+public class Server extends UnicastRemoteObject implements HRMService {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
     protected Server(EmployeeDAO employeeDAO) throws RemoteException {
