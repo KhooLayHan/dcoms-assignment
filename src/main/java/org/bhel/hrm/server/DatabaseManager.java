@@ -1,7 +1,6 @@
 package org.bhel.hrm.server;
 
 import org.bhel.hrm.server.config.Configuration;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,28 +12,78 @@ import java.sql.Statement;
 public final class DatabaseManager {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
 
-    private final Configuration configuration;
+    private final Configuration config;
+    private final ThreadLocal<Connection> transactionConnection = new ThreadLocal<>();
 
     public DatabaseManager(Configuration config) {
-        this.configuration = config;
+        this.config = config;
         initializeDatabase();
     }
 
-
+    /**
+     * Gets a connection. If a transaction is active on the current thread,
+     * it returns the transaction's connection. Otherwise, it creates a new one.
+     */
     public Connection getConnection() throws SQLException {
-        // jdbc:mysql://localhost:3306/hrm_db?useSSL=false&serverTimezone=UTC
-        final String DATABASE_URL = String.format("%s:%s://%s:%s/%s?useSSL=false&serverTimezone=UTC",
-            configuration.getDbDriver(),
-            configuration.getDbConnection(),
-            configuration.getDbHost(),
-            configuration.getDbPort(),
-            configuration.getDbName()
-        );
+        Connection conn = transactionConnection.get();
+        if (conn != null)
+            return conn; // Returns an existing transaction connection
 
-        final String DB_USER = configuration.getDbUser();
-        final String DB_PASSWORD = configuration.getDbPassword();
+        // Returns a new connection for a single, non-transactional operation
+        return DriverManager.getConnection(config.getDbUrl(), config.getDbUser(), config.getDbPassword());
+    }
 
-        return DriverManager.getConnection(DATABASE_URL, DB_USER, DB_PASSWORD);
+    public void beginTransaction() throws SQLException {
+        if (transactionConnection.get() != null)
+            throw new SQLException("Transaction is already active on this thread.");
+
+        Connection conn = DriverManager.getConnection(config.getDbUrl(), config.getDbUser(), config.getDbPassword());
+        conn.setAutoCommit(false);
+
+        transactionConnection.set(conn);
+        logger.debug("Transaction started for Thread [{}]", Thread.currentThread().getName());
+    }
+
+    public void commitTransaction() throws SQLException {
+        Connection conn = transactionConnection.get();
+
+        if (conn != null) {
+            try {
+                conn.commit();
+                logger.debug("Transaction commited for Thread [{}]", Thread.currentThread().getName());
+            } finally {
+                closeTransactionConnection();
+            }
+        }
+    }
+
+    public void rollbackTransaction() {
+        Connection conn = transactionConnection.get();
+
+        if (conn != null) {
+            try {
+                conn.rollback();
+                logger.warn("Transaction rolled back for Thread [{}]", Thread.currentThread().getName());
+            } catch (SQLException e) {
+                logger.error("Error during transaction rollback.", e);
+            } finally {
+                closeTransactionConnection();
+            }
+        }
+    }
+
+    private void closeTransactionConnection() {
+        Connection conn = transactionConnection.get();
+
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                logger.error("Error closing transaction connection.", e);
+            } finally {
+                transactionConnection.remove(); // Cleans up the ThreadLocal
+            }
+        }
     }
 
     private void initializeDatabase() {
