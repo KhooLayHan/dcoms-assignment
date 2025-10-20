@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface DAO<T, ID> {
     /**
      * Retrieves an entity by its ID.
+     *
      * @param id The ID of the entity.
      * @return An Optional containing the entity if found, otherwise an empty Optional.
      */
@@ -20,6 +21,7 @@ public interface DAO<T, ID> {
 
     /**
      * Retrieves all entities of this type.
+     *
      * @return A List of all entities.
      */
     List<T> findAll();
@@ -28,18 +30,21 @@ public interface DAO<T, ID> {
      * Saves a given entity. Use the returned instance for further operations
      * as the save operation might have changed the entity instance completely.
      * If the entity is new, it will be inserted. If it exists, it will be updated.
+     *
      * @param entity The entity to save.
      */
     T save(T entity);
 
     /**
      * Deletes an entity by its ID.
+     *
      * @param id The ID of the entity to delete.
      */
     void deleteById(ID id);
 
     /**
      * Returns the total number of entities.
+     *
      * @return The count of entities.
      */
     int count();

@@ -1,4 +1,4 @@
-package org.bhel.hrm.server.daos;
+package org.bhel.hrm.server.daos.impls;
 
 import org.bhel.hrm.server.DatabaseManager;
 import org.bhel.hrm.server.domain.Employee;
