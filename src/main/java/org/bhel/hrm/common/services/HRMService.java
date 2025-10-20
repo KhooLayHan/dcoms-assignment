@@ -19,6 +19,7 @@ public interface HRMService extends Remote {
 
     /**
      * Authenticates a user with their credentials.
+     *
      * @param username The user's username.
      * @param password The user's raw password.
      * @return A UserDTO if authentication is successful, otherwise null.
@@ -30,6 +31,7 @@ public interface HRMService extends Remote {
 
     /**
      * Registers a new employee, creating their user account and profile in one atomic operation.
+     *
      * @param registrationData A DTO containing all required details for the new user and employee.
      * @throws RemoteException if registration fails (e.g., username already exists) or a communication error occurs.
      */
@@ -37,6 +39,7 @@ public interface HRMService extends Remote {
 
     /**
      * Retrieves a list of all employees in the system.
+     *
      * @return A List of EmployeeDTOs.
      * @throws RemoteException if a communication-related error occurs.
      */
@@ -44,6 +47,7 @@ public interface HRMService extends Remote {
 
     /**
      * Retrieves the full profile details for a single employee.
+     *
      * @param employeeId The ID of the employee to fetch.
      * @return An EmployeeDTO containing the employee's details.
      * @throws RemoteException if the employee is not found or a communication error occurs.
@@ -52,6 +56,7 @@ public interface HRMService extends Remote {
 
     /**
      * Updates the profile information for an existing employee.
+     *
      * @param employeeDTO The DTO containing the updated information. The ID must be valid.
      * @throws RemoteException if the update fails or a communication error occurs.
      */
@@ -61,6 +66,7 @@ public interface HRMService extends Remote {
 
     /**
      * Submits a new leave application for an employee.
+     *
      * @param leaveApplicationDTO The DTO containing the details of the leave request.
      * @throws RemoteException if the application is invalid or a communication error occurs.
      */
@@ -68,6 +74,7 @@ public interface HRMService extends Remote {
 
     /**
      * Retrieves the leave history for a specific employee.
+     *
      * @param employeeId The ID of the employee whose leave history is being requested.
      * @return A List of the employee's LeaveApplicationDTOs.
      * @throws RemoteException if a communication-related error occurs.
@@ -78,6 +85,7 @@ public interface HRMService extends Remote {
 
     /**
      * Retrieves a list of all available training courses.
+     *
      * @return A List of TrainingCourseDTOs.
      * @throws RemoteException if a communication-related error occurs.
      */
@@ -85,6 +93,7 @@ public interface HRMService extends Remote {
 
     /**
      * Enrolls an employee in a specific training course.
+     *
      * @param employeeId The ID of the employee to enroll.
      * @param courseId The ID of the course to enroll in.
      * @throws RemoteException if enrollment fails (e.g., course is full) or a communication error occurs.
@@ -95,6 +104,7 @@ public interface HRMService extends Remote {
 
     /**
      * Retrieves a list of all open job positions.
+     *
      * @return A List of JobOpeningDTOs.
      * @throws RemoteException if a communication-related error occurs.
      */
@@ -102,6 +112,7 @@ public interface HRMService extends Remote {
 
     /**
      * Retrieves all applicants for a specific job opening.
+     *
      * @param jobOpeningId The ID of the job opening.
      * @return A List of ApplicantDTOs for that job.
      * @throws RemoteException if a communication-related error occurs.
@@ -111,6 +122,7 @@ public interface HRMService extends Remote {
     // --- 6. Benefits Management (For Employees and HR) ---
     /**
      * Retrieves a list of all benefit plans offered by the company.
+     *
      * @return A List of BenefitPlanDTOs.
      * @throws RemoteException if a communication-related error occurs.
      */
@@ -118,6 +130,7 @@ public interface HRMService extends Remote {
 
     /**
      * Enrolls an employee in a specific benefit plan.
+     *
      * @param employeeId The ID of the employee to enroll.
      * @param planId The ID of the benefit plan to enroll in.
      * @throws RemoteException if enrollment fails or a communication error occurs.
