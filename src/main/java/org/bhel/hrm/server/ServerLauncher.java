@@ -3,7 +3,11 @@ package org.bhel.hrm.server;
 import org.bhel.hrm.common.services.HRMService;
 import org.bhel.hrm.server.config.Configuration;
 import org.bhel.hrm.server.daos.EmployeeDAO;
+import org.bhel.hrm.server.daos.UserDAO;
+import org.bhel.hrm.server.daos.impls.EmployeeDAOImpl;
 
+import org.bhel.hrm.server.daos.impls.UserDAOImpl;
+import org.bhel.hrm.server.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +26,10 @@ public class ServerLauncher {
             @SuppressWarnings("java:S2440")
             DatabaseManager databaseManager = new DatabaseManager(configuration);
 
-            EmployeeDAO employeeDAO = new EmployeeDAO(databaseManager);
+            EmployeeDAO employeeDAO = new EmployeeDAOImpl(databaseManager);
+            UserDAO userDAO = new UserDAOImpl(databaseManager);
 
-            Server server = new Server(employeeDAO);
+            HRMServer server = new HRMServer(databaseManager, employeeDAO, userDAO);
 
             Registry registry = LocateRegistry.createRegistry(1099);
 
