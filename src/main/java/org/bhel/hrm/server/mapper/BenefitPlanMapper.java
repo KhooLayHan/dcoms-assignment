@@ -1,40 +1,36 @@
 package org.bhel.hrm.server.mapper;
 
-import org.bhel.hrm.common.dtos.LeaveApplicationDTO;
-import org.bhel.hrm.server.domain.LeaveApplication;
+import org.bhel.hrm.common.dtos.BenefitPlanDTO;
+import org.bhel.hrm.server.domain.BenefitPlan;
 
-public final class LeaveApplicationMapper {
-    private LeaveApplicationMapper() {
-        throw new UnsupportedOperationException("This class LeaveApplicationMapper is a utility class; it should not be instantiated.");
+public final class BenefitPlanMapper {
+    private BenefitPlanMapper() {
+        throw new UnsupportedOperationException("This class BenefitPlanMapper is a utility class; it should not be instantiated.");
     }
 
-    public static LeaveApplicationDTO mapToDto(LeaveApplication domain) {
+    public static BenefitPlanDTO mapToDto(BenefitPlan domain) {
         if (domain == null)
             return null;
 
-        return new LeaveApplicationDTO(
+        return new BenefitPlanDTO(
             domain.getId(),
-            domain.getEmployeeId(),
-            domain.getStartDateTime(),
-            domain.getEndDateTime(),
-            domain.getType(),
-            domain.getStatus(),
-            domain.getReason()
+            domain.getPlanName(),
+            domain.getProvider(),
+            domain.getDescription(),
+            domain.getCostPerMonth()
         );
     }
 
-    public static LeaveApplication mapToDomain(LeaveApplicationDTO dto) {
+    public static BenefitPlan mapToDomain(BenefitPlanDTO dto) {
         if (dto == null)
             return null;
 
-        return new LeaveApplication(
+        return new BenefitPlan(
             dto.id(),
-            dto.employeeId(),
-            dto.startDateTime(),
-            dto.endDateTime(),
-            dto.type(),
-            dto.status(),
-            dto.reason()
+            dto.planName(),
+            dto.provider(),
+            dto.description(),
+            dto.costPerMonth()
         );
     }
 }

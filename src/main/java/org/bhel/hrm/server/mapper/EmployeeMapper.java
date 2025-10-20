@@ -5,9 +5,9 @@ import org.bhel.hrm.server.domain.Employee;
 
 import java.util.List;
 
-public class EmployeeMapper {
+public final class EmployeeMapper {
     private EmployeeMapper() {
-        throw new UnsupportedOperationException("EmployeeMapper class");
+        throw new UnsupportedOperationException("This class EmployeeMapper is a utility class; it should not be instantiated.");
     }
 
     // Maps a single Domain object to a DTO

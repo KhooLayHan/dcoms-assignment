@@ -1,4 +1,36 @@
 package org.bhel.hrm.server.mapper;
 
-public class TrainingCourseMapper {
+import org.bhel.hrm.common.dtos.TrainingCourseDTO;
+import org.bhel.hrm.server.domain.TrainingCourse;
+
+public final class TrainingCourseMapper {
+    private TrainingCourseMapper() {
+        throw new UnsupportedOperationException("This class TrainingCourseMapper is a utility class; it should not be instantiated.");
+    }
+
+    public static TrainingCourseDTO mapToDto(TrainingCourse domain) {
+        if (domain == null)
+            return null;
+
+        return new TrainingCourseDTO(
+            domain.getId(),
+            domain.getTitle(),
+            domain.getDescription(),
+            domain.getDurationInHours(),
+            domain.getDepartment()
+        );
+    }
+
+    public static TrainingCourse toDomain(TrainingCourseDTO dto) {
+        if (dto == null)
+            return null;
+
+        return new TrainingCourse(
+            dto.id(),
+            dto.title(),
+            dto.description(),
+            dto.durationInHours(),
+            dto.department()
+        );
+    }
 }
