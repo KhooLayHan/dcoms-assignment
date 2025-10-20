@@ -6,13 +6,13 @@ import org.bhel.hrm.server.domain.Employee;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class EmployeeMapper {
+public class EmployeeMapper {
     private EmployeeMapper() {
         throw new UnsupportedOperationException("EmployeeMapper class");
     }
 
     // Maps a single Domain object to a DTO
-    public static EmployeeDTO toDto(Employee employee) {
+    public static EmployeeDTO mapToDto(Employee employee) {
         if (employee == null)
             return null;
 
@@ -26,21 +26,21 @@ public final class EmployeeMapper {
     }
 
     // Maps a single DTO to a Domain object
-    public static Employee toDomain(EmployeeDTO dto) {
+    public static Employee mapToDomain(EmployeeDTO dto) {
         if (dto == null)
             return null;
 
         return new Employee(
-                dto.id(),
-                dto.userId(),
-                dto.firstName(),
-                dto.lastName(),
-                dto.icPassport()
+            dto.id(),
+            dto.userId(),
+            dto.firstName(),
+            dto.lastName(),
+            dto.icPassport()
         );
     }
 
     // Converts a list of Domain objects to a list of unmodifiable DTOs
-    public static List<EmployeeDTO> toDtoList(List<Employee> employees) {
-        return employees.stream().map(EmployeeMapper::toDto).toList();
+    public static List<EmployeeDTO> mapToDtoList(List<Employee> employees) {
+        return employees.stream().map(EmployeeMapper::mapToDto).toList();
     }
 }
