@@ -1,31 +1,15 @@
 package org.bhel.hrm.server.daos;
 
-import org.bhel.hrm.server.DatabaseManager;
 import org.bhel.hrm.server.domain.Employee;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class EmployeeDAO implements IEmployeeDAO {
+public interface IEmployeeDAO {
+    Optional<Employee> findById(int id);
 
-    public EmployeeDAO(DatabaseManager dbManager) {
-    }
+    List<Employee> findAll();
 
-    @Override
-    public Optional<Employee> findById(int id) {
-        // Logic to select an employee by ID.
-        return Optional.empty();
-    }
+    void save(Employee employee);
 
-    @Override
-    public List<Employee> findAll() {
-        // Logic to query the DB and builds a List<Employee>. It returns a list of internal Domain objects.
-        return new ArrayList<>();
-    }
-
-    @Override
-    public void save(Employee employee) {
-        // Logic to insert the employee into the DB.
-    }
 }
