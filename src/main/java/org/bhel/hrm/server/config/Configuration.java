@@ -27,6 +27,17 @@ public class Configuration {
         }
     }
 
+    public String getDbUrl() {
+        // jdbc:mysql://localhost:3306/hrm_db?useSSL=false&serverTimezone=UTC
+        return String.format("%s:%s://%s:%s/%s?useSSL=false&serverTimezone=UTC",
+            getDbConnection(),
+            getDbDriver(),
+            getDbHost(),
+            getDbPort(),
+            getDbName()
+        );
+    }
+
     public String getDbConnection() {
         return properties.getProperty("db.connection");
     }
