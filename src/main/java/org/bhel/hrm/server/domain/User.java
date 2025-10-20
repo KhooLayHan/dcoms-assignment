@@ -16,6 +16,13 @@ public class User {
         this.role = role;
     }
 
+    public User(int id, String username, String passwordHash, UserDTO.Role role) {
+        this.id = id;
+        this.username = username;
+        this.passwordHash = passwordHash;
+        this.role = role;
+    }
+
     public int getId() {
         return id;
     }

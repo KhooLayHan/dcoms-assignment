@@ -1,13 +1,14 @@
 package org.bhel.hrm.server.daos.impls;
 
 import org.bhel.hrm.server.DatabaseManager;
+import org.bhel.hrm.server.daos.EmployeeDAO;
 import org.bhel.hrm.server.domain.Employee;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class EmployeeDAO implements IEmployeeDAO {
+public class EmployeeDAOImpl implements EmployeeDAO {
 
     public EmployeeDAO(DatabaseManager dbManager) {
     }
