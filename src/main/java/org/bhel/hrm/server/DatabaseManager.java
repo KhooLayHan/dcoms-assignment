@@ -50,7 +50,7 @@ public final class DatabaseManager {
         if (conn != null) {
             try {
                 conn.commit();
-                logger.debug("Transaction commited for Thread [{}]", Thread.currentThread().getName());
+                logger.debug("Transaction committed for Thread [{}]", Thread.currentThread().getName());
             } finally {
                 closeTransactionConnection();
             }
