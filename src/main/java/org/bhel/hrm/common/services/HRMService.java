@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * The remote service interface for the BHEL Human Resource Management system.
  * This interface defines the contract between the client and the server, specifying
- * all available remote operations. All data transfers is handled via DTOs.
+ * all available remote operations. All data transfers are handled via DTOs.
  */
 public interface HRMService extends Remote {
     // A unique name to reference the service from the RMI registry.
