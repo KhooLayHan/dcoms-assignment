@@ -1,6 +1,6 @@
 package org.bhel.hrm.client.controllers;
 
-import org.bhel.hrm.common.services.IService;
+import org.bhel.hrm.common.services.HRMService;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -17,13 +17,13 @@ public class LoginController {
     @FXML private TextField usernameField;
     @FXML private TextField passwordField;
 
-    private IService service;
+    private HRMService service;
 
     public LoginController() {
         // Connects to the RMI service when the controller is created.
         try {
             Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-            this.service = (IService) registry.lookup(IService.SERVICE_NAME);
+            this.service = (HRMService) registry.lookup(HRMService.SERVICE_NAME);
         } catch (Exception e) {
             logger.error("Client exception: Could not connect to the RMI service. {%s}", e);
         }
@@ -36,19 +36,19 @@ public class LoginController {
 
         // TODO: Validate input parameters locally.
 
-        try {
-            if (service.isUserAuthenticated(username, password)) {
-                logger.info("Login successful!");
-
-                // TODO: Closes the login window and opens the main dashboard.
-            } else {
-                logger.info("Login failed!");
-                // TODO: Shows a "Login failed" error message to the user.
-            }
-        } catch (Exception e) {
-            logger.error("Error during the authentication: {}", e.getMessage());
-
-            // TODO: Shows a connection error dialog.
-        }
+//        try {
+//            if (service.isUserAuthenticated(username, password)) {
+//                logger.info("Login successful!");
+//
+//                // TODO: Closes the login window and opens the main dashboard.
+//            } else {
+//                logger.info("Login failed!");
+//                // TODO: Shows a "Login failed" error message to the user.
+//            }
+//        } catch (Exception e) {
+//            logger.error("Error during the authentication: {}", e.getMessage());
+//
+//            // TODO: Shows a connection error dialog.
+//        }
     }
 }

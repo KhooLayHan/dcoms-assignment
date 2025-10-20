@@ -5,7 +5,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TableView;
 import org.bhel.hrm.common.dtos.EmployeeDTO;
-import org.bhel.hrm.common.services.IService;
+import org.bhel.hrm.common.services.HRMService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +20,7 @@ public class DashboardController implements Initializable {
     @FXML
     private TableView<EmployeeDTO> employeeDTOTableView;
 
-    private IService service;
+    private HRMService service;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -35,7 +35,7 @@ public class DashboardController implements Initializable {
     private void connectToRmiService() {
         try {
             Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-            this.service = (IService) registry.lookup(IService.SERVICE_NAME);
+            this.service = (HRMService) registry.lookup(HRMService.SERVICE_NAME);
         } catch (Exception e) {
             showErrorDialog("Connection Error", "Could not connect to the server.");
             logger.error("Error: {%s}", e);
