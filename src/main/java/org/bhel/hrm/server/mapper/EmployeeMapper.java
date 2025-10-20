@@ -6,7 +6,7 @@ import org.bhel.hrm.server.domain.Employee;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EmployeeMapper {
+public final class EmployeeMapper {
     private EmployeeMapper() {
         throw new UnsupportedOperationException("EmployeeMapper class");
     }
@@ -16,14 +16,13 @@ public class EmployeeMapper {
         if (employee == null)
             return null;
 
-        EmployeeDTO dto = new EmployeeDTO();
-
-        dto.setId(employee.getId());
-        dto.setFirstName(employee.getFirstName());
-        dto.setLastName(employee.getLastName());
-        dto.setIcPassport(employee.getIcPassport());
-
-        return dto;
+        return new EmployeeDTO(
+            employee.getId(),
+            employee.getUserId(),
+            employee.getFirstName(),
+            employee.getLastName(),
+            employee.getIcPassport()
+        );
     }
 
     // Maps a single DTO to a Domain object
@@ -31,18 +30,17 @@ public class EmployeeMapper {
         if (dto == null)
             return null;
 
-        Employee employee = new Employee();
-
-        employee.setId(dto.getId());
-        employee.setFirstName(dto.getFirstName());
-        employee.setLastName(dto.getFirstName());
-        employee.setIcPassport(dto.getIcPassport());
-
-        return employee;
+        return new Employee(
+                dto.id(),
+                dto.userId(),
+                dto.firstName(),
+                dto.lastName(),
+                dto.icPassport()
+        );
     }
 
-    // Converts a list of Domain objects to a list of DTOs
+    // Converts a list of Domain objects to a list of unmodifiable DTOs
     public static List<EmployeeDTO> toDtoList(List<Employee> employees) {
-        return employees.stream().map(EmployeeMapper::toDto).collect(Collectors.toList());
+        return employees.stream().map(EmployeeMapper::toDto).toList();
     }
 }
