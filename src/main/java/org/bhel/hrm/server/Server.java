@@ -27,13 +27,13 @@ public class Server extends UnicastRemoteObject implements IService {
     public List<EmployeeDTO> getAllEmployees() throws RemoteException {
         logger.info("RMI Call: getAllEmployees received.");
         List<Employee> employees = employeeDAO.findAll();
-        return EmployeeMapper.toDtoList(employees);
+        return EmployeeMapper.mapToDtoList(employees);
     }
 
     @Override
     public void registerEmployee(EmployeeDTO employeeDTO) {
-        logger.info("RMI Call: registerEmployee for '{}' received.", employeeDTO.getFirstName());
-        Employee employee = EmployeeMapper.toDomain(employeeDTO);
+        logger.info("RMI Call: registerEmployee for '{}' received.", employeeDTO.firstName());
+        Employee employee = EmployeeMapper.mapToDomain(employeeDTO);
         employeeDAO.save(employee);
     }
 

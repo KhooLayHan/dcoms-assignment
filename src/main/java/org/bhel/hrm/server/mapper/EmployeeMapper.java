@@ -39,7 +39,7 @@ public class EmployeeMapper {
         );
     }
 
-    // Converts a list of Domain objects to a list of unmodifiable DTOs
+    // Maps a list of Domain objects to a list of unmodifiable DTOs
     public static List<EmployeeDTO> mapToDtoList(List<Employee> employees) {
         return employees.stream().map(EmployeeMapper::mapToDto).toList();
     }
