@@ -27,6 +27,10 @@ public class Configuration {
         }
     }
 
+    public String getAppEnvironment() {
+        return properties.getProperty("app.environment", "production");
+    }
+
     public String getDbUrl() {
         // jdbc:mysql://localhost:3306/hrm_db?useSSL=false&serverTimezone=UTC
         return String.format("%s:%s://%s:%s/%s?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC",

@@ -21,18 +21,26 @@ public class ServerLauncher {
         try {
             logger.info("HRM Server is starting up...");
 
+            // 1. Load the configuration
             Configuration configuration = new Configuration();
+            logger.info("Application is starting in [{}] environment.", configuration.getAppEnvironment());
 
+            // 2. Setup database and DAOs
             @SuppressWarnings("java:S2440")
             DatabaseManager databaseManager = new DatabaseManager(configuration);
 
             EmployeeDAO employeeDAO = new EmployeeDAOImpl(databaseManager);
             UserDAO userDAO = new UserDAOImpl(databaseManager);
 
+            // 3. Conditionally seed the database
+            if ("development".equalsIgnoreCase(configuration.getAppEnvironment())) {
+                DatabaseSeeder seeder = new DatabaseSeeder(databaseManager, userDAO, employeeDAO);
+                seeder.seedIfEmpty();
+            }
+
+            // 4. Setup and start the RMI server
             HRMServer server = new HRMServer(databaseManager, employeeDAO, userDAO);
-
             Registry registry = LocateRegistry.createRegistry(1099);
-
             registry.rebind(HRMService.SERVICE_NAME, server);
 
             logger.info("Server is running and waiting for client connections...");
