@@ -33,7 +33,7 @@ public interface DAO<T, ID> {
      *
      * @param entity The entity to save.
      */
-    T save(T entity);
+    void save(T entity);
 
     /**
      * Deletes an entity by its ID.
@@ -47,5 +47,5 @@ public interface DAO<T, ID> {
      *
      * @return The count of entities.
      */
-    int count();
+    long count();
 }
