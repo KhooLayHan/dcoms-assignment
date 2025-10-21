@@ -8,17 +8,13 @@
 
 <?import javafx.scene.text.Font?>
 <BorderPane fx:id="mainPane" prefHeight="720.0" prefWidth="1280.0"
-            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.bhel.hrm.client.controller.MainController">
+            stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.bhel.hrm.client.controllers.MainController">
 
     <!-- LEFT: Vertical Navigation Bar -->
     <left>
-        <VBox alignment="TOP_CENTER" spacing="10.0" style="-fx-background-color: #f4f4f4; -fx-padding: 10;">
-            <Label text="BHEL HRM">
-                <font>
-                    <Font name="System Bold" size="20.0"/>
-                </font>
-            </Label>
+        <VBox alignment="TOP_CENTER" spacing="10.0" styleClass="sidebar">
+            <Label text="BHEL HRM" styleClass="sidebar-title" />
             <Separator prefWidth="180.0"/>
 
             <!-- Navigation Buttons will be dynamically added here based on user role -->
@@ -26,14 +22,14 @@
 
             <Pane VBox.vgrow="ALWAYS"/> <!-- This pushes the logout button to the bottom -->
 
-            <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout" maxWidth="Infinity"/>
+            <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout" maxWidth="Infinity" styleClass="login-button" />
         </VBox>
     </left>
 
     <!-- CENTER: Main Content Area -->
     <center>
         <!-- This StackPane will hold the dynamically loaded pages -->
-        <StackPane fx:id="contentArea" style="-fx-padding: 20;">
+        <StackPane fx:id="contentArea" styleClass="content-area">
             <!-- A placeholder label -->
             <Label text="Welcome! Please select an option from the menu." />
         </StackPane>
