@@ -34,44 +34,47 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 
     @Override
     public void save(Employee employee) {
-        if (employee.getId() == 0) {
-            String sql = "INSERT INTO employees (user_id, first_name, last_name, ic_passport) VALUES (?, ?, ?, ?)";
+        String sql = (employee.getId() == 0)
+                ? "INSERT INTO employees (user_id, first_name, last_name, ic_passport) VALUES (?, ?, ?, ?)"
+                : "UPDATE employees SET user_id = ?, first_name = ?, last_name = ?, ic_passport = ? WHERE id = ?";
 
-            try (
-                Connection conn = dbManager.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
-            ) {
+        Connection conn;
+        try {
+            // NOTE: try-with-resources will automatically call the `.close()` method for any
+            // resource declared within it when the block is exited. Thus, the connection
+            // will fail and crash immediately. Ensure that the connection lifecycle is handled
+            // entirely by DatabaseManager by calling it outside the try-with-resources block.
+            conn = dbManager.getConnection();
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setInt(1, employee.getUserId());
                 stmt.setString(2, employee.getFirstName());
                 stmt.setString(3, employee.getLastName());
                 stmt.setString(4, employee.getIcPassport());
 
+                if (employee.getId() != 0)
+                    stmt.setInt(5, employee.getId()); // Set ID for UPDATE clause
+
                 stmt.executeUpdate();
 
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                    if (generatedKeys.next())
-                        employee.setId(generatedKeys.getInt(1)); // Sets the new ID back on the object
+                // If INSERT clause, get the generated ID
+                if (employee.getId() == 0) {
+                    try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                        if (generatedKeys.next())
+                            employee.setId(generatedKeys.getInt(1)); // Sets the new ID back on the object
+                    }
                 }
             } catch (SQLException e) {
-                logger.error("Error inserting new employee: {}", employee.getFirstName(), e);
+                logger.error("Error inserting new employee: {} {}", employee.getFirstName(), employee.getLastName(), e);
+            } finally {
+                // IMPORTANT: Only close the connection IF IT'S NOT PART OF A TRANSACTION.
+                // Our DatabaseManager's transaction methods will handle closing.
+                // For simplicity in this structure, we can assume the service layer will close it.
+                // A more advanced implementation would have the DatabaseManager track this.
+                // For now, the key is NOT to auto-close it here.
             }
-        } else {
-            String sql = "UPDATE employees SET user_id = ?, first_name = ?, last_name = ?, ic_passport = ? WHERE id = ?";
-
-            try (
-                Connection conn = dbManager.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)
-            ) {
-                stmt.setInt(1, employee.getUserId());
-                stmt.setString(2, employee.getFirstName());
-                stmt.setString(3, employee.getLastName());
-                stmt.setString(4, employee.getIcPassport());
-                stmt.setInt(5, employee.getId());
-
-                stmt.executeUpdate();
-            } catch (SQLException e) {
-                logger.error("Error updating employee: {}", employee.getId(), e);
-            }
+        } catch (SQLException e) {
+            logger.error("Error inserting new employee: {} {}", employee.getFirstName(), employee.getLastName(), e);
         }
     }
 
