@@ -14,8 +14,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ResourceBundle;
 
-public class DashboardController implements Initializable {
-    private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);
+public class HRDashboardController implements Initializable {
+    private static final Logger logger = LoggerFactory.getLogger(HRDashboardController.class);
 
     @FXML
     private TableView<EmployeeDTO> employeeDTOTableView;
@@ -37,13 +37,24 @@ public class DashboardController implements Initializable {
             Registry registry = LocateRegistry.getRegistry("localhost", 1099);
             this.service = (HRMService) registry.lookup(HRMService.SERVICE_NAME);
         } catch (Exception e) {
-            showErrorDialog("Connection Error", "Could not connect to the server.");
-            logger.error("Error: {%s}", e);
+            logger.error("Client Error: Could not connect to the RMI service.", e);
+            showErrorDialog("Connection Error", "Could not connect to the server. Please ensure the server is running.");
         }
     }
 
     private void loadEmployeeData() {
-        // TODO: Populate the table view with data from the server.
+        if (service == null)
+            return;
+
+        try {
+            // TODO: Populate the table view with data from the server.
+            logger.debug("Fetching all employees...");
+            // employeeTable.getItems().setAll(hrmService.getAllEmployees());
+        } catch (Exception e) {
+            logger.error("Failed to fetch employee data.", e);
+            showErrorDialog("Data Error", "Could not fetch employee data from the server.");
+        }
+
     }
 
     @FXML
