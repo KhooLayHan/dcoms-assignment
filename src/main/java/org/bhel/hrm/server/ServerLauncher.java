@@ -9,6 +9,7 @@ import org.bhel.hrm.server.daos.impls.UserDAOImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
@@ -23,21 +24,8 @@ public class ServerLauncher {
             Configuration configuration = new Configuration();
             logger.info("Application is starting in [{}] environment.", configuration.getAppEnvironment());
 
-            // 2. Setup database and DAOs
-            @SuppressWarnings("java:S2440")
-            DatabaseManager databaseManager = new DatabaseManager(configuration);
-
-            EmployeeDAO employeeDAO = new EmployeeDAOImpl(databaseManager);
-            UserDAO userDAO = new UserDAOImpl(databaseManager);
-
-            // 3. Conditionally seed the database
-            if ("development".equalsIgnoreCase(configuration.getAppEnvironment())) {
-                DatabaseSeeder seeder = new DatabaseSeeder(databaseManager, userDAO, employeeDAO);
-                seeder.seedIfEmpty();
-            }
-
             // 4. Setup and start the RMI server
-            HRMServer server = new HRMServer(databaseManager, employeeDAO, userDAO);
+            HRMServer server = getHRMServer(configuration);
             Registry registry = LocateRegistry.createRegistry(1099);
             registry.rebind(HRMService.SERVICE_NAME, server);
 
@@ -46,5 +34,21 @@ public class ServerLauncher {
             logger.error("Server exception: {}", e.toString());
             logger.error("A fatal error occurred during startup {}", e.getMessage());
         }
+    }
+
+    private static HRMServer getHRMServer(Configuration configuration) throws RemoteException {
+        DatabaseManager databaseManager = new DatabaseManager(configuration);
+
+        // 2. Setup database and DAOs
+        EmployeeDAO employeeDAO = new EmployeeDAOImpl(databaseManager);
+        UserDAO userDAO = new UserDAOImpl(databaseManager);
+
+        // 3. Conditionally seed the database
+        if ("development".equalsIgnoreCase(configuration.getAppEnvironment())) {
+            DatabaseSeeder seeder = new DatabaseSeeder(databaseManager, userDAO, employeeDAO);
+            seeder.seedIfEmpty();
+        }
+
+        return new HRMServer(databaseManager, employeeDAO, userDAO);
     }
 }

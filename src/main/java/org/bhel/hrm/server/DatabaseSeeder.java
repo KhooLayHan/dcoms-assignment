@@ -23,7 +23,7 @@ public class DatabaseSeeder {
         this.dbManager = dbManager;
         this.userDAO = userDAO;
         this.employeeDAO = employeeDAO;
-        this.faker = new Faker(new Locale("en-US"));
+        this.faker = new Faker(Locale.of("en-US"));
     }
 
     /**
