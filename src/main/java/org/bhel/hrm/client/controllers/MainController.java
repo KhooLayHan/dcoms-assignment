@@ -46,23 +46,17 @@ public class MainController implements Initializable {
 
         // Role-based navigation
         if (currentUser.role() == UserDTO.Role.HR_STAFF) {
+            addNavigationBtn("Employees",
+                () -> ViewManager.loadView(contentArea, "/org/bhel/hrm/client/view/HRDashboardView.fxml"));
 
-            Button employeeManagementBtn = new Button("Employees");
-            employeeManagementBtn.setOnAction(e -> logger.info("Loading employee management view"));
-            employeeManagementBtn.setMaxWidth(Double.MAX_VALUE);
-            navigationVBox.getChildren().add(employeeManagementBtn);
-
-            Button recruimentBtn = new Button("Recruitment");
-            recruimentBtn.setOnAction(e -> logger.info("Loading recruitment view"));
-            recruimentBtn.setMaxWidth(Double.MAX_VALUE);
-            navigationVBox.getChildren().add(recruimentBtn);
+            addNavigationBtn("Recruitment", () -> logger.info("Loading recruitment view..."));
+            addNavigationBtn("Training Admin", () -> logger.info("Loading training admin view..."));
         }
 
         if (currentUser.role() == UserDTO.Role.EMPLOYEE || currentUser.role() == UserDTO.Role.HR_STAFF) {
-            Button leaveBtn = new Button("Leave Applications");
-            leaveBtn.setOnAction(e -> logger.info("Loading leave application view"));
-            leaveBtn.setMaxWidth(Double.MAX_VALUE);
-            navigationVBox.getChildren().add(leaveBtn);
+            addNavigationBtn("My Profile", () -> logger.info("Loading profile view..."));
+            addNavigationBtn("Leave Applications", () -> logger.info("Loading leave applications view..."));
+            addNavigationBtn("Training Catalog", () -> logger.info("Loading training catalog view..."));
         }
     }
 
