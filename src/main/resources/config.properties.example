@@ -1,3 +1,6 @@
+# Application Environment (e.g. development, staging, production)
+app.environment=
+
 # MySQL Database Connection
 db.connection=mysql
 db.driver=jdbc
