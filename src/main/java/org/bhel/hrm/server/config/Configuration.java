@@ -29,9 +29,9 @@ public class Configuration {
 
     public String getDbUrl() {
         // jdbc:mysql://localhost:3306/hrm_db?useSSL=false&serverTimezone=UTC
-        return String.format("%s:%s://%s:%s/%s?useSSL=false&serverTimezone=UTC",
-            getDbConnection(),
+        return String.format("%s:%s://%s:%s/%s?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC",
             getDbDriver(),
+            getDbConnection(),
             getDbHost(),
             getDbPort(),
             getDbName()
