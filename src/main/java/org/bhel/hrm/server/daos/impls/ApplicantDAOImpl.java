@@ -34,8 +34,7 @@ public class ApplicantDAOImpl implements ApplicantDAO {
     }
 
     @Override
-    public Applicant save(Applicant entity) {
-        return null;
+    public void save(Applicant entity) {
     }
 
     @Override
@@ -44,7 +43,7 @@ public class ApplicantDAOImpl implements ApplicantDAO {
     }
 
     @Override
-    public int count() {
+    public long count() {
         return 0;
     }
 }

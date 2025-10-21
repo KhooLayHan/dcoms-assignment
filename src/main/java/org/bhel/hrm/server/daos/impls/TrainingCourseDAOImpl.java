@@ -31,8 +31,7 @@ public class TrainingCourseDAOImpl implements TrainingCourseDAO {
     }
 
     @Override
-    public TrainingCourse save(TrainingCourse entity) {
-        return null;
+    public void save(TrainingCourse entity) {
     }
 
     @Override
@@ -41,7 +40,7 @@ public class TrainingCourseDAOImpl implements TrainingCourseDAO {
     }
 
     @Override
-    public int count() {
+    public long count() {
         return 0;
     }
 }

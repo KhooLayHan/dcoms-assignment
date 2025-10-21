@@ -40,8 +40,8 @@ public class JobOpeningDAOImpl implements JobOpeningDAO {
     }
 
     @Override
-    public JobOpening save(JobOpening entity) {
-        return null;
+    public void save(JobOpening entity) {
+
     }
 
     @Override
@@ -50,7 +50,7 @@ public class JobOpeningDAOImpl implements JobOpeningDAO {
     }
 
     @Override
-    public int count() {
+    public long count() {
         return 0;
     }
 }

@@ -37,17 +37,14 @@ public class LeaveApplicationDAOImpl implements LeaveApplicationDAO {
     }
 
     @Override
-    public LeaveApplication save(LeaveApplication entity) {
-        return null;
+    public void save(LeaveApplication entity) {
     }
 
     @Override
-    public void deleteById(Integer integer) {
-
-    }
+    public void deleteById(Integer integer) {}
 
     @Override
-    public int count() {
+    public long count() {
         return 0;
     }
 }
