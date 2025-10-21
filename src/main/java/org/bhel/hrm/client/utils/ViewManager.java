@@ -23,6 +23,8 @@ public class ViewManager {
      */
     public static void loadView(Pane container, String fxmlPath) {
         try {
+            logger.debug("Loading view: {}", fxmlPath);
+
             Parent view = FXMLLoader.load(Objects.requireNonNull(ViewManager.class.getResource(fxmlPath)));
             container.getChildren().setAll(view);
         } catch (IOException e) {
