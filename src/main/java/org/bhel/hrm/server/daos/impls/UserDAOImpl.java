@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,20 +22,50 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public Optional<User> findById(Integer integer) {
+    public Optional<User> findById(Integer id) {
+        String sql = "SELECT id, username, password_hash, role_id FROM users WHERE id = ?";
+
+        try (
+            Connection conn = dbManager.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, id);
+
+            try (ResultSet result = stmt.executeQuery()) {
+                if (result.next())
+                    return Optional.of(mapRowToUser(result));
+            }
+        } catch (SQLException e) {
+            logger.error("Error finding user by ID: {}", id, e);
+        }
+
         return Optional.empty();
     }
 
     @Override
     public List<User> findAll() {
-        return List.of();
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT id, username, password_hash, role_id FROM users ORDER BY username ASC";
+
+        try (
+            Connection conn = dbManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet result = stmt.executeQuery(sql);
+        ) {
+            while (result.next())
+                users.add(mapRowToUser(result));
+        } catch (SQLException e) {
+            logger.error("Error finding all users", e);
+        }
+
+        return users;
     }
 
     @Override
     public void save(User user) {
         String sql = (user.getId() == 0)
-                ? "INSERT INTO users (username, password_hash, role_id) VALUES (?, ?, ?)"
-                : "UPDATE users SET username = ?, password_hash = ?, role_id = ? WHERE id = ?";
+            ? "INSERT INTO users (username, password_hash, role_id) VALUES (?, ?, ?)"
+            : "UPDATE users SET username = ?, password_hash = ?, role_id = ? WHERE id = ?";
 
         Connection conn;
         try {
@@ -63,12 +94,6 @@ public class UserDAOImpl implements UserDAO {
                 }
             } catch (SQLException e) {
                 logger.error("Error inserting new user: {}", user.getUsername(), e);
-            } finally {
-                // IMPORTANT: Only close the connection IF IT'S NOT PART OF A TRANSACTION.
-                // Our DatabaseManager's transaction methods will handle closing.
-                // For simplicity in this structure, we can assume the service layer will close it.
-                // A more advanced implementation would have the DatabaseManager track this.
-                // For now, the key is NOT to auto-close it here.
             }
         } catch (SQLException e) {
             logger.error("Error inserting new user: {}", user.getUsername(), e);
@@ -76,7 +101,18 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public void deleteById(Integer integer) {
+    public void deleteById(Integer id) {
+        String sql = "DELETE FROM users WHERE id = ?";
+
+        try (
+            Connection conn = dbManager.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error deleting user by ID: {}", id, e);
+        }
     }
 
     @Override
