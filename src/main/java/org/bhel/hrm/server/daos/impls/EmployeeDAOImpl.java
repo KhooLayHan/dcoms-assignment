@@ -1,91 +1,173 @@
 package org.bhel.hrm.server.daos.impls;
 
-import org.bhel.hrm.common.dtos.UserDTO;
 import org.bhel.hrm.server.DatabaseManager;
+import org.bhel.hrm.server.daos.AbstractDAO;
 import org.bhel.hrm.server.daos.EmployeeDAO;
 import org.bhel.hrm.server.domain.Employee;
-import org.bhel.hrm.server.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class EmployeeDAOImpl implements EmployeeDAO {
+public class EmployeeDAOImpl extends AbstractDAO<Employee> implements EmployeeDAO {
     private static final Logger logger = LoggerFactory.getLogger(EmployeeDAOImpl.class);
 
-    private final DatabaseManager dbManager;
+    private final RowMapper<Employee> rowMapper = result -> new Employee(
+        result.getInt("id"),
+        result.getInt("user_id"),
+        result.getString("first_name"),
+        result.getString("last_name"),
+        result.getString("ic_passport")
+    );
 
     public EmployeeDAOImpl(DatabaseManager dbManager) {
-        this.dbManager = dbManager;
+        super(dbManager);
     }
 
     @Override
-    public Optional<Employee> findById(Integer integer) {
-        return Optional.empty();
-    }
+    public Optional<Employee> findById(Integer id) {
+        String sql = """
+            SELECT
+                id,
+                user_id,
+                first_name,
+                last_name,
+                ic_passport
+            FROM
+                employees
+            WHERE
+                id = ?
+        """;
 
-    @Override
-    public List<Employee> findAll() {
-        return List.of();
-    }
-
-    @Override
-    public void save(Employee employee) {
-        String sql = (employee.getId() == 0)
-                ? "INSERT INTO employees (user_id, first_name, last_name, ic_passport) VALUES (?, ?, ?, ?)"
-                : "UPDATE employees SET user_id = ?, first_name = ?, last_name = ?, ic_passport = ? WHERE id = ?";
-
-        Connection conn;
         try {
-            // NOTE: try-with-resources will automatically call the `.close()` method for any
-            // resource declared within it when the block is exited. Thus, the connection
-            // will fail and crash immediately. Ensure that the connection lifecycle is handled
-            // entirely by DatabaseManager by calling it outside the try-with-resources block.
-            conn = dbManager.getConnection();
-
-            try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                stmt.setInt(1, employee.getUserId());
-                stmt.setString(2, employee.getFirstName());
-                stmt.setString(3, employee.getLastName());
-                stmt.setString(4, employee.getIcPassport());
-
-                if (employee.getId() != 0)
-                    stmt.setInt(5, employee.getId()); // Set ID for UPDATE clause
-
-                stmt.executeUpdate();
-
-                // If INSERT clause, get the generated ID
-                if (employee.getId() == 0) {
-                    try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                        if (generatedKeys.next())
-                            employee.setId(generatedKeys.getInt(1)); // Sets the new ID back on the object
-                    }
-                }
-            } catch (SQLException e) {
-                logger.error("Error inserting new employee: {} {}", employee.getFirstName(), employee.getLastName(), e);
-            } finally {
-                // IMPORTANT: Only close the connection IF IT'S NOT PART OF A TRANSACTION.
-                // Our DatabaseManager's transaction methods will handle closing.
-                // For simplicity in this structure, we can assume the service layer will close it.
-                // A more advanced implementation would have the DatabaseManager track this.
-                // For now, the key is NOT to auto-close it here.
-            }
-        } catch (SQLException e) {
-            logger.error("Error inserting new employee: {} {}", employee.getFirstName(), employee.getLastName(), e);
+            return findOne(sql, stmt -> stmt.setInt(1, id), rowMapper);
+        } catch (Exception e) {
+            logger.error("Error finding employee by ID: {}", id, e);
+            return Optional.empty();
         }
     }
 
     @Override
-    public void deleteById(Integer integer) {
+    public List<Employee> findAll() {
+        String sql = """
+            SELECT
+                id,
+                user_id,
+                first_name,
+                last_name,
+                ic_passport
+            FROM
+                employees
+            ORDER BY
+                first_name, last_name ASC
+        """;
 
+        try {
+            return findMany(sql, stmt -> {}, rowMapper);
+        } catch (Exception e) {
+            logger.error("Error finding all users", e);
+            return List.of();
+        }
+    }
+
+    @Override
+    public void save(Employee employee) {
+        if (employee.getId() == 0)
+            insert(employee);
+        else
+            update(employee);
+    }
+
+    private void insert(Employee employee) {
+        String sql = """
+            INSERT INTO
+                employees (
+                    user_id,
+                    first_name,
+                    last_name,
+                    ic_passport
+                )
+            VALUES (
+                ?,
+                ?,
+                ?,
+                ?
+            )
+        """;
+
+        try (
+            Connection conn = dbManager.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+        ) {
+            setSaveParameters(stmt, employee);
+            stmt.executeUpdate();
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next())
+                    employee.setId(generatedKeys.getInt(1)); // Sets the new ID back on the object
+            }
+        } catch (SQLException e) {
+            logger.error("Error inserting new user: {} {}", employee.getFirstName(), employee.getLastName(), e);
+        }
+    }
+
+    private void update(Employee employee) {
+        String sql = """
+            UPDATE
+                employees
+            SET
+                user_id = ?,
+                first_name = ?,
+                last_name = ?,
+                ic_passport = ?
+            WHERE
+                id = ?
+        """;
+
+        try {
+            executeUpdate(sql, stmt -> {
+                setSaveParameters(stmt, employee);
+                stmt.setInt(4, employee.getId());
+            });
+        } catch (Exception e) {
+            logger.error("Error updating existing user: {} {}", employee.getFirstName(), employee.getLastName(), e);
+        }
+    }
+
+    @Override
+    protected void setSaveParameters(PreparedStatement stmt, Employee employee) throws SQLException {
+        stmt.setInt(1, employee.getUserId());
+        stmt.setString(2, employee.getFirstName());
+        stmt.setString(3, employee.getLastName());
+        stmt.setString(4, employee.getIcPassport());
+    }
+
+    @Override
+    public void deleteById(Integer id) {
+        String sql = """
+            DELETE FROM
+                employees
+            WHERE
+                id = ?
+        """;
+
+        try {
+            executeUpdate(sql, stmt -> stmt.setInt(1, id));
+        } catch (Exception e) {
+            logger.error("Error deleting user by ID: {}", id, e);
+        }
     }
 
     @Override
     public long count() {
-        String sql = "SELECT COUNT(*) FROM employees";
+        String sql = """
+            SELECT
+                COUNT(*)
+            FROM
+                employees
+        """;
 
         try (
             Connection conn = dbManager.getConnection();
@@ -99,15 +181,5 @@ public class EmployeeDAOImpl implements EmployeeDAO {
         }
 
         return 0;
-    }
-
-    private Employee mapRowToEmployee(ResultSet result) throws SQLException {
-        return new Employee(
-            result.getInt("id"),
-            result.getInt("user_id"),
-            result.getString("first_name"),
-            result.getString("last_name"),
-            result.getString("ic_passport")
-        );
     }
 }
