@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 class UserDAOImplTest {
 
     @Container
-    private static final MySQLContainer mysql = new MySQLContainer("mysql:9.4.0");
+    private static final MySQLContainer mysql = new MySQLContainer("mysql:8.4.0");
     private static UserDAO userDAO;
 
     @BeforeAll
