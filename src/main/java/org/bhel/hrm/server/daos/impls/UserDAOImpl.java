@@ -19,9 +19,7 @@ public class UserDAOImpl extends AbstractDAO<User> implements UserDAO {
         result.getInt("id"),
         result.getString("username"),
         result.getString("password_hash"),
-        result.getInt("role_id") == 1
-            ? UserDTO.Role.HR_STAFF
-            : UserDTO.Role.EMPLOYEE
+        mapRole(result.getObject("role_id", Integer.class))
     );
 
     public UserDAOImpl(DatabaseManager dbManager) {
@@ -180,5 +178,16 @@ public class UserDAOImpl extends AbstractDAO<User> implements UserDAO {
         """;
 
         return findOne(sql, stmt -> stmt.setString(1, username), rowMapper);
+    }
+
+    private static UserDTO.Role mapRole(Integer roleId) {
+        if (roleId == null)
+            throw new IllegalStateException("users.role_id is NULL");
+
+        return switch (roleId) {
+            case 1 -> UserDTO.Role.HR_STAFF;
+            case 2 -> UserDTO.Role.EMPLOYEE;
+            default -> throw new IllegalArgumentException("Unknown users.role_id=" + roleId);
+        };
     }
 }
