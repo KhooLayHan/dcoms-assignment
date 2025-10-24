@@ -85,6 +85,8 @@ public abstract class AbstractDAO<T> {
                 while (result.next())
                     results.add(mapper.mapRow(result));
             }
+
+            logger.info("{}", stmt);
         } catch (SQLException e) {
             logger.error("Error executing query: {}", sql, e);
         }
@@ -100,11 +102,13 @@ public abstract class AbstractDAO<T> {
      */
     protected void executeUpdate(String sql, StatementSetter setter) {
         try (
-                Connection conn = dbManager.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)
+            Connection conn = dbManager.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)
         ) {
             setter.setValues(stmt);
             stmt.executeUpdate();
+
+            logger.info("{}", stmt);
         } catch (SQLException e) {
             logger.error("Error executing update: {}", sql, e);
         }

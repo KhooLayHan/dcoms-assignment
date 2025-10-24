@@ -42,12 +42,7 @@ public class UserDAOImpl extends AbstractDAO<User> implements UserDAO {
                 id = ?
         """;
 
-        try {
-            return findOne(sql, stmt -> stmt.setInt(1, id), rowMapper);
-        } catch (Exception e) {
-            logger.error("Error finding user by ID: {}", id, e);
-            return Optional.empty();
-        }
+        return findOne(sql, stmt -> stmt.setInt(1, id), rowMapper);
     }
 
     @Override
@@ -64,12 +59,7 @@ public class UserDAOImpl extends AbstractDAO<User> implements UserDAO {
                 username ASC
         """;
 
-        try {
-            return findMany(sql, stmt -> {}, rowMapper);
-        } catch (Exception e) {
-            logger.error("Error finding all users", e);
-            return List.of();
-        }
+        return findMany(sql, stmt -> {}, rowMapper);
     }
 
     @Override
@@ -125,14 +115,10 @@ public class UserDAOImpl extends AbstractDAO<User> implements UserDAO {
                 id = ?
         """;
 
-        try {
-            executeUpdate(sql, stmt -> {
-                setSaveParameters(stmt, user);
-                stmt.setInt(4, user.getId());
-            });
-        } catch (Exception e) {
-            logger.error("Error updating existing user: {}", user.getUsername(), e);
-        }
+        executeUpdate(sql, stmt -> {
+            setSaveParameters(stmt, user);
+            stmt.setInt(4, user.getId());
+        });
     }
 
     @Override
@@ -151,11 +137,7 @@ public class UserDAOImpl extends AbstractDAO<User> implements UserDAO {
                 id = ?
         """;
 
-        try {
-            executeUpdate(sql, stmt -> stmt.setInt(1, id));
-        } catch (Exception e) {
-            logger.error("Error deleting user by ID: {}", id, e);
-        }
+        executeUpdate(sql, stmt -> stmt.setInt(1, id));
     }
 
     @Override
@@ -174,6 +156,8 @@ public class UserDAOImpl extends AbstractDAO<User> implements UserDAO {
         ) {
             if (result.next())
                 return Math.toIntExact(result.getLong(1));
+
+            logger.info("{}", stmt);
         } catch (SQLException e) {
             logger.error("Error counting users", e);
         }
@@ -195,11 +179,6 @@ public class UserDAOImpl extends AbstractDAO<User> implements UserDAO {
                 username = ?
         """;
 
-        try {
-            return findOne(sql, stmt -> stmt.setString(1, username), rowMapper);
-        } catch (Exception e) {
-            logger.error("Error finding user by username: {}", username, e);
-            return Optional.empty();
-        }
+        return findOne(sql, stmt -> stmt.setString(1, username), rowMapper);
     }
 }

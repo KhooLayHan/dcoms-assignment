@@ -41,12 +41,7 @@ public class EmployeeDAOImpl extends AbstractDAO<Employee> implements EmployeeDA
                 id = ?
         """;
 
-        try {
-            return findOne(sql, stmt -> stmt.setInt(1, id), rowMapper);
-        } catch (Exception e) {
-            logger.error("Error finding employee by ID: {}", id, e);
-            return Optional.empty();
-        }
+        return findOne(sql, stmt -> stmt.setInt(1, id), rowMapper);
     }
 
     @Override
@@ -64,12 +59,7 @@ public class EmployeeDAOImpl extends AbstractDAO<Employee> implements EmployeeDA
                 first_name, last_name ASC
         """;
 
-        try {
-            return findMany(sql, stmt -> {}, rowMapper);
-        } catch (Exception e) {
-            logger.error("Error finding all users", e);
-            return List.of();
-        }
+        return findMany(sql, stmt -> {}, rowMapper);
     }
 
     @Override
@@ -128,14 +118,10 @@ public class EmployeeDAOImpl extends AbstractDAO<Employee> implements EmployeeDA
                 id = ?
         """;
 
-        try {
-            executeUpdate(sql, stmt -> {
-                setSaveParameters(stmt, employee);
-                stmt.setInt(4, employee.getId());
-            });
-        } catch (Exception e) {
-            logger.error("Error updating existing user: {} {}", employee.getFirstName(), employee.getLastName(), e);
-        }
+        executeUpdate(sql, stmt -> {
+            setSaveParameters(stmt, employee);
+            stmt.setInt(4, employee.getId());
+        });
     }
 
     @Override
@@ -155,11 +141,7 @@ public class EmployeeDAOImpl extends AbstractDAO<Employee> implements EmployeeDA
                 id = ?
         """;
 
-        try {
-            executeUpdate(sql, stmt -> stmt.setInt(1, id));
-        } catch (Exception e) {
-            logger.error("Error deleting user by ID: {}", id, e);
-        }
+        executeUpdate(sql, stmt -> stmt.setInt(1, id));
     }
 
     @Override
@@ -178,6 +160,8 @@ public class EmployeeDAOImpl extends AbstractDAO<Employee> implements EmployeeDA
         ) {
             if (result.next())
                 return Math.toIntExact(result.getLong(1));
+
+            logger.info("{}", stmt);
         } catch (SQLException e) {
             logger.error("Error counting employees", e);
         }
