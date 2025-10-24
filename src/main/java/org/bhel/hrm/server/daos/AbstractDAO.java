@@ -75,20 +75,24 @@ public abstract class AbstractDAO<T> {
     protected List<T> findMany(String sql, StatementSetter setter, RowMapper<T> mapper) {
         List<T> results = new ArrayList<>();
 
-        try (
-                Connection conn = dbManager.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)
-        ) {
-            setter.setValues(stmt);
+        Connection conn = null;
+        try {
+            conn = dbManager.getConnection();
 
-            try (ResultSet result = stmt.executeQuery()) {
-                while (result.next())
-                    results.add(mapper.mapRow(result));
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                setter.setValues(stmt);
+
+                try (ResultSet result = stmt.executeQuery()) {
+                    while (result.next())
+                        results.add(mapper.mapRow(result));
+                }
+
+                logger.info("{}", stmt);
             }
-
-            logger.info("{}", stmt);
         } catch (SQLException e) {
             logger.error("Error executing query: {}", sql, e);
+        } finally {
+            dbManager.releaseConnection(conn);
         }
 
         return results;
@@ -101,16 +105,21 @@ public abstract class AbstractDAO<T> {
      * @param setter A lambda expression to set the parameters on the PreparedStatement.
      */
     protected void executeUpdate(String sql, StatementSetter setter) {
-        try (
-            Connection conn = dbManager.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)
-        ) {
-            setter.setValues(stmt);
-            stmt.executeUpdate();
+        Connection conn = null;
 
-            logger.info("{}", stmt);
+        try {
+            conn = dbManager.getConnection();
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                setter.setValues(stmt);
+                stmt.executeUpdate();
+
+                logger.info("{}", stmt);
+            }
         } catch (SQLException e) {
             logger.error("Error executing update: {}", sql, e);
+        } finally {
+            dbManager.releaseConnection(conn);
         }
     }
 

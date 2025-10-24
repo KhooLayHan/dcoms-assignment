@@ -73,6 +73,22 @@ public final class DatabaseManager {
         }
     }
 
+    public void releaseConnection(Connection conn) {
+        Connection tx = transactionConnection.get();
+
+        if (conn != null && conn != tx) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                logger.error("Error closing transaction connection.", e);
+            }
+        }
+    }
+
+    public boolean isTransactionActive() {
+        return transactionConnection.get() != null;
+    }
+
     private void closeTransactionConnection() {
         Connection conn = transactionConnection.get();
 
