@@ -100,7 +100,7 @@ public class EmployeeDAOImpl extends AbstractDAO<Employee> implements EmployeeDA
                     employee.setId(generatedKeys.getInt(1)); // Sets the new ID back on the object
             }
         } catch (SQLException e) {
-            logger.error("Error inserting new user: {} {}", employee.getFirstName(), employee.getLastName(), e);
+            logger.error("Error inserting new employee: {} {}", employee.getFirstName(), employee.getLastName(), e);
         }
     }
 
@@ -120,7 +120,7 @@ public class EmployeeDAOImpl extends AbstractDAO<Employee> implements EmployeeDA
 
         executeUpdate(sql, stmt -> {
             setSaveParameters(stmt, employee);
-            stmt.setInt(4, employee.getId());
+            stmt.setInt(5, employee.getId());
         });
     }
 
