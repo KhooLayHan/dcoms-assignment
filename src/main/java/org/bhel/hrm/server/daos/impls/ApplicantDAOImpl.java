@@ -15,10 +15,21 @@ import java.util.Optional;
 public class ApplicantDAOImpl extends AbstractDAO<Applicant> implements ApplicantDAO {
     private static final Logger logger = LoggerFactory.getLogger(ApplicantDAOImpl.class);
 
+    /**
+     * Creates a new ApplicantDAOImpl configured with the given database manager.
+     *
+     * @param dbManager the DatabaseManager used for database access and lifecycle operations
+     */
     public ApplicantDAOImpl(DatabaseManager dbManager) {
         super(dbManager);
     }
 
+    /**
+     * Finds applicants for the specified job opening.
+     *
+     * @param jobOpeningId the primary key of the job opening
+     * @return a list of applicants associated with the job opening; empty list if none are found
+     */
     @Override
     public List<Applicant> findByJobOpeningId(int jobOpeningId) {
         return List.of();
@@ -34,25 +45,52 @@ public class ApplicantDAOImpl extends AbstractDAO<Applicant> implements Applican
         return List.of();
     }
 
+    /**
+     * Persists the provided Applicant to the underlying data store.
+     *
+     * @param entity the Applicant to create or update
+     */
     @Override
     public void save(Applicant entity) {
     }
 
+    /**
+     * Inserts the given Applicant into the underlying data store.
+     *
+     * @param entity the Applicant to insert; must contain the required fields for persistence
+     */
     @Override
     protected void insert(Applicant entity) {
 
     }
 
+    /**
+     * Update the persisted Applicant record to match the provided entity.
+     *
+     * @param entity the Applicant whose current state should be written to the persistent store; must identify an existing record
+     */
     @Override
     protected void update(Applicant entity) {
 
     }
 
+    /**
+     * Set SQL parameters on the given PreparedStatement for persisting the specified Applicant.
+     *
+     * @param stmt   the PreparedStatement to populate with parameter values
+     * @param entity the Applicant whose values will be bound to the statement
+     * @throws SQLException if an SQL error occurs while setting any parameter on the statement
+     */
     @Override
     protected void setSaveParameters(PreparedStatement stmt, Applicant entity) throws SQLException {
 
     }
 
+    /**
+     * Deletes the applicant identified by the given id from the data store.
+     *
+     * @param integer the unique identifier of the applicant to delete
+     */
     @Override
     public void deleteById(Integer integer) {
 

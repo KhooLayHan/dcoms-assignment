@@ -25,6 +25,11 @@ public abstract class AbstractDAO<T> {
 
     protected final DatabaseManager dbManager;
 
+    /**
+     * Creates a new AbstractDAO backed by the provided DatabaseManager.
+     *
+     * @param dbManager the DatabaseManager used to obtain JDBC connections for DAO operations
+     */
     protected AbstractDAO(DatabaseManager dbManager) {
         this.dbManager = dbManager;
     }
@@ -36,7 +41,14 @@ public abstract class AbstractDAO<T> {
      */
     @FunctionalInterface
     protected interface RowMapper<R> {
-        R mapRow(ResultSet result) throws SQLException;
+        /**
+ * Maps the current row of the given ResultSet to an instance of R.
+ *
+ * @param result the ResultSet positioned at the row to map
+ * @return an instance of R representing the mapped row
+ * @throws SQLException if an SQL error occurs while reading from the ResultSet
+ */
+R mapRow(ResultSet result) throws SQLException;
     }
 
     /**
@@ -45,7 +57,13 @@ public abstract class AbstractDAO<T> {
      */
     @FunctionalInterface
     protected interface StatementSetter {
-        void setValues(PreparedStatement stmt) throws SQLException;
+        /**
+ * Bind parameters on the provided PreparedStatement prior to its execution.
+ *
+ * @param stmt the PreparedStatement to set parameters on
+ * @throws SQLException if an error occurs while setting parameter values
+ */
+void setValues(PreparedStatement stmt) throws SQLException;
     }
 
     /**
@@ -115,17 +133,17 @@ public abstract class AbstractDAO<T> {
     }
 
     /**
-     * Inserts a new entity into the data store.
-     *
-     * @param entity The entity to be inserted; must not be null.
-     */
+ * Persist the provided entity in the data store.
+ *
+ * @param entity the entity to persist; must not be null
+ */
     protected abstract void insert(T entity);
 
     /**
-     * Updates an existing entity in the data store.
-     *
-     * @param entity The entity to be updated; must not be null and must exist in the data store.
-     */
+ * Persist changes of an existing entity to the underlying data store.
+ *
+ * @param entity the entity to update; must not be null and must already exist in the data store
+ */
     protected abstract void update(T entity);
 
     /**
