@@ -172,44 +172,6 @@ class UserDAOImplTest {
                 .containsExactly("alice", "bob", "charlie");
         }
 
-//        @Test
-//        @DisplayName("should insert and retrieve user with HR_STAFF role")
-//        void shouldInsertAndRetrieveHRStaff() {
-//            // Given
-//            User newUser = new User(0, "hr.admin", "hashed_pass_123", UserDTO.Role.HR_STAFF);
-//
-//            // When
-//            userDAO.save(newUser);
-//
-//            // Then
-//            assertThat(newUser.getId()).isNotZero();
-//
-//            Optional<User> retrieved = userDAO.findById(newUser.getId());
-//            assertThat(retrieved).isPresent();
-//            assertThat(retrieved.get())
-//                    .extracting(User::getId, User::getUsername, User::getPasswordHash, User::getRole)
-//                    .containsExactly(newUser.getId(), "hr.admin", "hashed_pass_123", UserDTO.Role.HR_STAFF);
-//        }
-
-//        @Test
-//        @DisplayName("should return all users ordered by username")
-//        void shouldReturnAllUsersOrderedByUsername() {
-//            // Given
-//            userDAO.save(new User(0, "charlie", "pass3", UserDTO.Role.EMPLOYEE));
-//            userDAO.save(new User(0, "alice", "pass1", UserDTO.Role.HR_STAFF));
-//            userDAO.save(new User(0, "bob", "pass2", UserDTO.Role.EMPLOYEE));
-//
-//            // When
-//            List<User> users = userDAO.findAll();
-//
-//            // Then
-//            assertThat(users.get())
-////                    .hasSize(3)
-//
-//                    .extracting(User::getUsername)
-//                    .containsExactly("alice", "bob", "charlie");
-//        }
-
         @Test
         @DisplayName("count() should return the total number of users")
         void count_shouldReturnTotalNumberOfUsers() {
