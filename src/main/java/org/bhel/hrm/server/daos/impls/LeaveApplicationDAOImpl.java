@@ -36,25 +36,28 @@ public class LeaveApplicationDAOImpl extends AbstractDAO<LeaveApplication> imple
 
     @Override
     public void save(LeaveApplication entity) {
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     protected void insert(LeaveApplication entity) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     protected void update(LeaveApplication entity) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     protected void setSaveParameters(PreparedStatement stmt, LeaveApplication entity) throws SQLException {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
-    public void deleteById(Integer integer) {}
+    public void deleteById(Integer integer) {
+        throw new UnsupportedOperationException("not implemented yet");
+    }
 
     @Override
     public long count() {

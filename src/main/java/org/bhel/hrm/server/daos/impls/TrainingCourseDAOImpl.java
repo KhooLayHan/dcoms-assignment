@@ -39,22 +39,22 @@ public class TrainingCourseDAOImpl extends AbstractDAO<TrainingCourse> implement
 
     @Override
     protected void insert(TrainingCourse course) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     protected void update(TrainingCourse course) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     protected void setSaveParameters(PreparedStatement stmt, TrainingCourse entity) throws SQLException {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     public void deleteById(Integer integer) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override

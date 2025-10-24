@@ -37,27 +37,27 @@ public class JobOpeningDAOImpl extends AbstractDAO<JobOpening> implements JobOpe
 
     @Override
     public void save(JobOpening entity) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     protected void insert(JobOpening entity) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     protected void update(JobOpening entity) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     protected void setSaveParameters(PreparedStatement stmt, JobOpening entity) throws SQLException {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     public void deleteById(Integer integer) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override

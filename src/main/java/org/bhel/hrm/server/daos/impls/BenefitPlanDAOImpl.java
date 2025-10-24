@@ -31,26 +31,27 @@ public class BenefitPlanDAOImpl extends AbstractDAO<BenefitPlan> implements Bene
 
     @Override
     public void save(BenefitPlan entity) {
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     protected void insert(BenefitPlan entity) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     protected void update(BenefitPlan entity) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     protected void setSaveParameters(PreparedStatement stmt, BenefitPlan entity) throws SQLException {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     public void deleteById(Integer integer) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override

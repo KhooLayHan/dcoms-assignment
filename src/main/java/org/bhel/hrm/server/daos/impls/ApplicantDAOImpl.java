@@ -36,26 +36,27 @@ public class ApplicantDAOImpl extends AbstractDAO<Applicant> implements Applican
 
     @Override
     public void save(Applicant entity) {
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     protected void insert(Applicant entity) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     protected void update(Applicant entity) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     protected void setSaveParameters(PreparedStatement stmt, Applicant entity) throws SQLException {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
     public void deleteById(Integer integer) {
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
