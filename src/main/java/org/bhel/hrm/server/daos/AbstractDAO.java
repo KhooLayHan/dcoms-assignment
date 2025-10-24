@@ -74,19 +74,25 @@ public abstract class AbstractDAO<T> {
      */
     protected List<T> findMany(String sql, StatementSetter setter, RowMapper<T> mapper) {
         List<T> results = new ArrayList<>();
+        Connection conn = null;
 
-        try (
-            Connection conn = dbManager.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)
-        ) {
-            setter.setValues(stmt);
+        try {
+            conn = dbManager.getConnection();
 
-            try (ResultSet result = stmt.executeQuery()) {
-                while (result.next())
-                    results.add(mapper.mapRow(result));
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                setter.setValues(stmt);
+
+                try (ResultSet result = stmt.executeQuery()) {
+                    while (result.next())
+                        results.add(mapper.mapRow(result));
+                }
+
+                logger.info("{}", stmt);
             }
         } catch (SQLException e) {
             logger.error("Error executing query: {}", sql, e);
+        } finally {
+            dbManager.releaseConnection(conn);
         }
 
         return results;
@@ -99,16 +105,37 @@ public abstract class AbstractDAO<T> {
      * @param setter A lambda expression to set the parameters on the PreparedStatement.
      */
     protected void executeUpdate(String sql, StatementSetter setter) {
-        try (
-            Connection conn = dbManager.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)
-        ) {
-            setter.setValues(stmt);
-            stmt.executeUpdate();
+        Connection conn = null;
+
+        try {
+            conn = dbManager.getConnection();
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                setter.setValues(stmt);
+                stmt.executeUpdate();
+
+                logger.info("{}", stmt);
+            }
         } catch (SQLException e) {
             logger.error("Error executing update: {}", sql, e);
+        } finally {
+            dbManager.releaseConnection(conn);
         }
     }
+
+    /**
+     * Inserts a new entity into the data store.
+     *
+     * @param entity The entity to be inserted; must not be null.
+     */
+    protected abstract void insert(T entity);
+
+    /**
+     * Updates an existing entity in the data store.
+     *
+     * @param entity The entity to be updated; must not be null and must exist in the data store.
+     */
+    protected abstract void update(T entity);
 
     /**
      * An abstract "hook" method, part of the Template Method Pattern for saving entities.
