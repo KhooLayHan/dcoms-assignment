@@ -80,7 +80,8 @@ public class UserDAOImpl extends AbstractDAO<User> implements UserDAO {
             update(user);
     }
 
-    private void insert(User user) {
+    @Override
+    protected void insert(User user) {
         String sql = """
             INSERT INTO
                 users (
@@ -111,7 +112,8 @@ public class UserDAOImpl extends AbstractDAO<User> implements UserDAO {
         }
     }
 
-    private void update(User user) {
+    @Override
+    protected void update(User user) {
         String sql = """
             UPDATE
                 users

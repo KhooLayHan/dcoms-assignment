@@ -111,6 +111,20 @@ public abstract class AbstractDAO<T> {
     }
 
     /**
+     * Inserts a new entity into the data store.
+     *
+     * @param entity The entity to be inserted; must not be null.
+     */
+    protected abstract void insert(T entity);
+
+    /**
+     * Updates an existing entity in the data store.
+     *
+     * @param entity The entity to be updated; must not be null and must exist in the data store.
+     */
+    protected abstract void update(T entity);
+
+    /**
      * An abstract "hook" method, part of the Template Method Pattern for saving entities.
      * Concrete DAO implementations must provide the logic for mapping an entity's fields
      * to the parameters of a PreparedStatement for an INSERT or UPDATE operation.
