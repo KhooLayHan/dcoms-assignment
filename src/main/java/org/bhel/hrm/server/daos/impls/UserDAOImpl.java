@@ -84,20 +84,27 @@ public class UserDAOImpl extends AbstractDAO<User> implements UserDAO {
             )
         """;
 
-        try (
-            Connection conn = dbManager.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
-        ) {
-            setSaveParameters(stmt, user);
-            stmt.executeUpdate();
+        Connection conn = null;
 
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next())
-                    user.setId(generatedKeys.getInt(1)); // Sets the new ID back on the object
+        try {
+            conn = dbManager.getConnection();
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                setSaveParameters(stmt, user);
+                stmt.executeUpdate();
+
+                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                    if (generatedKeys.next())
+                        user.setId(generatedKeys.getInt(1)); // Sets the new ID back on the object
+                }
             }
         } catch (SQLException e) {
             logger.error("Error inserting new user: {}", user.getUsername(), e);
+        } finally {
+            dbManager.releaseConnection(conn);
         }
+
+
     }
 
     @Override

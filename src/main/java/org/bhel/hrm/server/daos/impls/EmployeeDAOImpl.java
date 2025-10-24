@@ -88,19 +88,24 @@ public class EmployeeDAOImpl extends AbstractDAO<Employee> implements EmployeeDA
             )
         """;
 
-        try (
-            Connection conn = dbManager.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
-        ) {
-            setSaveParameters(stmt, employee);
-            stmt.executeUpdate();
+        Connection conn = null;
 
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next())
-                    employee.setId(generatedKeys.getInt(1)); // Sets the new ID back on the object
+        try {
+            conn = dbManager.getConnection();
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                setSaveParameters(stmt, employee);
+                stmt.executeUpdate();
+
+                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                    if (generatedKeys.next())
+                        employee.setId(generatedKeys.getInt(1)); // Sets the new ID back on the object
+                }
             }
         } catch (SQLException e) {
             logger.error("Error inserting new employee: {} {}", employee.getFirstName(), employee.getLastName(), e);
+        } finally {
+            dbManager.releaseConnection(conn);
         }
     }
 

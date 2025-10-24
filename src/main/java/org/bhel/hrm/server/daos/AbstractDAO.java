@@ -74,8 +74,8 @@ public abstract class AbstractDAO<T> {
      */
     protected List<T> findMany(String sql, StatementSetter setter, RowMapper<T> mapper) {
         List<T> results = new ArrayList<>();
-
         Connection conn = null;
+
         try {
             conn = dbManager.getConnection();
 

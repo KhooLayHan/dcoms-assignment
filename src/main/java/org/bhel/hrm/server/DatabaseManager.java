@@ -80,7 +80,7 @@ public final class DatabaseManager {
             try {
                 conn.close();
             } catch (SQLException e) {
-                logger.error("Error closing transaction connection.", e);
+                logger.error("Error closing connection.", e);
             }
         }
     }
