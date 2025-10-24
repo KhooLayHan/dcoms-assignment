@@ -60,8 +60,8 @@ public abstract class AbstractDAO<T> {
         List<T> results = findMany(sql, setter, mapper);
 
         return results.isEmpty()
-                ? Optional.empty()
-                : Optional.of(results.getFirst());
+            ? Optional.empty()
+            : Optional.of(results.getFirst());
     }
 
     /**
