@@ -91,6 +91,36 @@ class UserDAOImplTest {
             // Then: The result should be an empty Optional
             assertThat(foundUserOpt).isEmpty();
         }
+
+        @Test
+        @DisplayName("findByUsername() should return the correct user when they exist")
+        void findByUsername_shouldReturnCorrectUser_whenUserExists() {
+            // Given: A user is saved to the database
+            User newUser = new User(0, "find_me_username", "password123", UserDTO.Role.HR_STAFF);
+            userDAO.save(newUser);
+
+            // When: We try to find that user by their generated ID
+            Optional<User> foundUserOpt = userDAO.findByUsername(newUser.getUsername());
+
+            // Then: The user should be found and all properties should match
+            assertThat(foundUserOpt).hasValueSatisfying(user ->
+                assertThat(user)
+                    .usingRecursiveComparison()
+                    .isEqualTo(newUser)
+            );
+        }
+
+        @Test
+        @DisplayName("findByUsername() should return an empty Optional when the user does not exist")
+        void findByUsername_shouldReturnEmpty_whenUserDoesNotExist() {
+            // Given: No user exists with the given username
+
+            // When: We try to find a user with a non-existent username
+            Optional<User> foundUserOpt = userDAO.findByUsername("non-existent user");
+
+            // Then: The result should be an empty Optional
+            assertThat(foundUserOpt).isEmpty();
+        }
     }
 
     @Nested
