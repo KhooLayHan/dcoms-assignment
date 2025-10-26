@@ -1,6 +1,9 @@
 package org.bhel.hrm.common.services;
 
 import org.bhel.hrm.common.dtos.*;
+import org.bhel.hrm.server.exceptions.AuthenticationException;
+import org.bhel.hrm.server.exceptions.DataAccessLayerException;
+import org.bhel.hrm.server.exceptions.DuplicateUserException;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -25,7 +28,7 @@ public interface HRMService extends Remote {
      * @return A UserDTO if authentication is successful, otherwise null.
      * @throws RemoteException if a communication-related error occurs.
      */
-    UserDTO authenticateUser(String username, String password) throws RemoteException;
+    UserDTO authenticateUser(String username, String password) throws RemoteException, AuthenticationException, DataAccessLayerException;
 
     // --- 2. Employee Management (Primarily for HR Staff) ---
 
@@ -35,7 +38,7 @@ public interface HRMService extends Remote {
      * @param registrationData A DTO containing all required details for the new user and employee.
      * @throws RemoteException if registration fails (e.g., username already exists) or a communication error occurs.
      */
-    void registerNewEmployee(NewEmployeeRegistrationDTO registrationData) throws RemoteException;
+    void registerNewEmployee(NewEmployeeRegistrationDTO registrationData) throws RemoteException, DuplicateUserException;
 
     /**
      * Retrieves a list of all employees in the system.

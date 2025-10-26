@@ -1,6 +1,7 @@
 package org.bhel.hrm.server.daos;
 
 import org.bhel.hrm.server.DatabaseManager;
+import org.bhel.hrm.server.exceptions.DataAccessLayerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +91,7 @@ public abstract class AbstractDAO<T> {
                 logger.info("{}", stmt);
             }
         } catch (SQLException e) {
-            logger.error("Error executing query: {}", sql, e);
+            throw new DataAccessLayerException("Error executing query: " + sql, e);
         } finally {
             dbManager.releaseConnection(conn);
         }
@@ -117,7 +118,7 @@ public abstract class AbstractDAO<T> {
                 logger.info("{}", stmt);
             }
         } catch (SQLException e) {
-            logger.error("Error executing update: {}", sql, e);
+            throw new DataAccessLayerException("Error executing update: " + sql, e);
         } finally {
             dbManager.releaseConnection(conn);
         }

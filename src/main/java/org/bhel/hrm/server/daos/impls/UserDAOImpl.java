@@ -5,6 +5,7 @@ import org.bhel.hrm.server.DatabaseManager;
 import org.bhel.hrm.server.daos.AbstractDAO;
 import org.bhel.hrm.server.daos.UserDAO;
 import org.bhel.hrm.server.domain.User;
+import org.bhel.hrm.server.exceptions.DataAccessLayerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,12 +100,10 @@ public class UserDAOImpl extends AbstractDAO<User> implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            logger.error("Error inserting new user: {}", user.getUsername(), e);
+            throw new DataAccessLayerException("Error inserting new user: " + user.getUsername(), e);
         } finally {
             dbManager.releaseConnection(conn);
         }
-
-
     }
 
     @Override
@@ -164,7 +163,7 @@ public class UserDAOImpl extends AbstractDAO<User> implements UserDAO {
 
             logger.info("{}", stmt);
         } catch (SQLException e) {
-            logger.error("Error counting users", e);
+            throw new DataAccessLayerException("Error counting users", e);
         }
 
         return 0;

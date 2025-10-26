@@ -6,12 +6,17 @@ import org.bhel.hrm.server.daos.EmployeeDAO;
 import org.bhel.hrm.server.daos.UserDAO;
 import org.bhel.hrm.server.domain.Employee;
 import org.bhel.hrm.server.domain.User;
+import org.bhel.hrm.server.exceptions.AuthenticationException;
+import org.bhel.hrm.server.exceptions.DataAccessLayerException;
+import org.bhel.hrm.server.exceptions.DuplicateUserException;
+import org.bhel.hrm.server.exceptions.UserNotFoundException;
 import org.bhel.hrm.server.mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,36 +34,40 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
     }
 
     @Override
-    public UserDTO authenticateUser(String username, String password) throws RemoteException {
+    public UserDTO authenticateUser(String username, String password) throws RemoteException, AuthenticationException, DataAccessLayerException {
         logger.info("Authentication attempt for user: {}.", username);
 
-        Optional<User> userOpt = userDAO.findByUsername(username);
-        if (userOpt.isEmpty()) {
-            logger.warn("Authentication failed: User '{}' not found.", username);
-            return null;
-        }
+        try {
+            User user = userDAO.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
 
-        User user = userOpt.get();
-        boolean passwordMatches = PasswordService.checkPassword(password, user.getPasswordHash());
+            boolean passwordMatches = PasswordService.checkPassword(password, user.getPasswordHash());
+            if (!passwordMatches)
+                throw new AuthenticationException("Invalid password provided.");
 
-        if (passwordMatches) {
             logger.info("User '{}' authenticated successfully.", username);
             return UserMapper.mapToDto(user);
-        } else {
-            logger.warn("Authentication failed: Invalid password for user '{}'.", username);
-            return null;
+
+        } catch (UserNotFoundException | AuthenticationException e) {
+            logger.warn("Authentication failed for user '{}': {}", username, e.getMessage()); // Issue here
+            throw new AuthenticationException("Invalid username or password"); // Issue here
+        } catch (DataAccessLayerException e) {
+            logger.error("A database error occurred during authentication for user '{}'.", username, e); // Issue here
+            throw new RemoteException("Server error during authentication.", e); // Issue here
         }
     }
 
     @Override
-    public void registerNewEmployee(NewEmployeeRegistrationDTO registrationData) throws RemoteException {
+    public void registerNewEmployee(NewEmployeeRegistrationDTO registrationData) throws RemoteException, DuplicateUserException {
         logger.info("Attempting to register new employee: {}.", registrationData.username());
 
+        // Business rule check: Does the user already exist?
+        if (userDAO.findByUsername(registrationData.username()).isPresent())
+            throw new DuplicateUserException(registrationData.username());
+
         try {
-            // 1. Starts the transaction
             dbManager.beginTransaction();
 
-            // 2. Create and save the User domain object
             User newUser = new User(
                 registrationData.username(),
                 PasswordService.hashPassword(registrationData.initialPassword()),
@@ -66,24 +75,27 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
             );
             userDAO.save(newUser);
 
-            // 3. Create and save the Employee domain object, linking it to the new User
             Employee newEmployee = new Employee(
-                newUser.getId(), // Uses the ID generated from the new User saved
+                newUser.getId(),
                 registrationData.firstName(),
                 registrationData.lastName(),
                 registrationData.icPassport()
             );
             employeeDAO.save(newEmployee);
 
-            // 4. If both operations succeed, commit the transaction
             dbManager.commitTransaction();
             logger.info("Successfully registered the new Employee {} with user ID {}.", newEmployee.getFirstName(), newEmployee.getId());
-        } catch (Exception e) {
-            // 5. If any exceptions occurred, roll back the entire transaction
+
+        } catch (DataAccessLayerException e) {
             logger.error("Registration failed for user '{}'. Rolling back transaction.", registrationData.username());
 
             dbManager.rollbackTransaction();
-            throw new RemoteException("Employee registration failed due to a server error.");
+            throw new RemoteException("Employee registration failed due to a server-side error.");
+        } catch (SQLException e) {
+            logger.error("SQL error occurred during the registration transaction for user {}. Rolling back transaction.", registrationData.username(), e);
+
+            dbManager.rollbackTransaction();
+            throw new RemoteException("Server transaction failed during registration.", e);
         }
     }
 
