@@ -248,5 +248,5 @@ gradle-app.setting
 *.hprof
 
 # Configuration files
-config.properties
+*.properties
 .env
