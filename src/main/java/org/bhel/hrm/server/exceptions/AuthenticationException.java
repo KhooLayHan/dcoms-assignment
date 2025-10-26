@@ -12,6 +12,6 @@ public final class AuthenticationException extends HRMException {
      * @param username The username that failed authentication
      */
     public AuthenticationException(String username) {
-        super("User with username " + username + " was not found.");
+        super("Invalid username or password.");
     }
 }
