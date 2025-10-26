@@ -6,22 +6,23 @@ import org.bhel.hrm.server.daos.EmployeeDAO;
 import org.bhel.hrm.server.daos.UserDAO;
 import org.bhel.hrm.server.domain.Employee;
 import org.bhel.hrm.server.domain.User;
+import org.bhel.hrm.server.mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.Optional;
 
 public class HRMServer extends UnicastRemoteObject implements HRMService {
     private static final Logger logger = LoggerFactory.getLogger(HRMServer.class);
 
-    private final DatabaseManager dbManager;
-    private final EmployeeDAO employeeDAO;
-    private final UserDAO userDAO;
+    private final transient DatabaseManager dbManager;
+    private final transient EmployeeDAO employeeDAO;
+    private final transient UserDAO userDAO;
 
     public HRMServer(DatabaseManager databaseManager, EmployeeDAO employeeDAO, UserDAO userDAO) throws RemoteException {
-        super();
         this.dbManager = databaseManager;
         this.employeeDAO = employeeDAO;
         this.userDAO = userDAO;
@@ -29,12 +30,29 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
 
     @Override
     public UserDTO authenticateUser(String username, String password) throws RemoteException {
-        return null;
+        logger.info("Authentication attempt for user: {}.", username);
+
+        Optional<User> userOpt = userDAO.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            logger.warn("Authentication failed: User '{}' not found.", username);
+            return null;
+        }
+
+        User user = userOpt.get();
+        boolean passwordMatches = PasswordService.checkPassword(password, user.getPasswordHash());
+
+        if (passwordMatches) {
+            logger.info("User '{}' authenticated successfully.", username);
+            return UserMapper.mapToDto(user);
+        } else {
+            logger.warn("Authentication failed: Invalid password for user '{}'.", username);
+            return null;
+        }
     }
 
     @Override
     public void registerNewEmployee(NewEmployeeRegistrationDTO registrationData) throws RemoteException {
-        logger.info("Attempting to register new employee: {}", registrationData.username());
+        logger.info("Attempting to register new employee: {}.", registrationData.username());
 
         try {
             // 1. Starts the transaction
@@ -43,7 +61,7 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
             // 2. Create and save the User domain object
             User newUser = new User(
                 registrationData.username(),
-                registrationData.initialPassword(),
+                PasswordService.hashPassword(registrationData.initialPassword()),
                 registrationData.role()
             );
             userDAO.save(newUser);
@@ -81,12 +99,12 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
 
     @Override
     public void updateEmployeeProfile(EmployeeDTO employeeDTO) throws RemoteException {
-
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     @Override
     public void applyForLeave(LeaveApplicationDTO leaveApplicationDTO) throws RemoteException {
-
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     @Override
@@ -101,7 +119,7 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
 
     @Override
     public void enrollInTraining(int employeeId, int courseId) throws RemoteException {
-
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     @Override
@@ -121,6 +139,6 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
 
     @Override
     public void enrollInBenefitPlan(int employeeId, int planId) throws RemoteException {
-
+        throw new UnsupportedOperationException("not yet implemented");
     }
 }
