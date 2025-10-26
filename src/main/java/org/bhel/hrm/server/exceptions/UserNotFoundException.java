@@ -13,6 +13,6 @@ public final class UserNotFoundException extends HRMException {
      * @param identifier The username that was not found
      */
     public UserNotFoundException(String identifier) {
-        super("User with username " + identifier + " was not found.");
+        super("User with identifier " + identifier + " was not found.");
     }
 }
