@@ -4,10 +4,14 @@ package org.bhel.hrm.common.exceptions;
  * A runtime exception thrown when there is a critical, unrecoverable error
  * during a database operation (e.g., connection failure, SQL syntax error).
  * <p>
- * This exception should be used to wrap underlying data access failures
- * and propagate them as unchecked exceptions.
+ * This exception serves as a base class for more specific data access exceptions
+ * and is used to wrap underlying data access failures, propagating them as unchecked exceptions.
  */
-public class DataAccessException extends RuntimeException {
+public sealed class DataAccessException extends RuntimeException permits
+    CannotAcquireLockException,
+    DataAccessResourceFailureException,
+    DataIntegrityViolationException,
+    IncorrectSqlGrammarException {
     /**
      * Constructs a new DataAccessException with the specified detail message and cause.
      *
