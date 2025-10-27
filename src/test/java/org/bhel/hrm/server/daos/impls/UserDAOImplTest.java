@@ -99,7 +99,7 @@ class UserDAOImplTest {
             User newUser = new User(0, "find_me_username", "password123", UserDTO.Role.HR_STAFF);
             userDAO.save(newUser);
 
-            // When: We try to find that user by their generated ID
+            // When: We try to find that user by their generated username
             Optional<User> foundUserOpt = userDAO.findByUsername(newUser.getUsername());
 
             // Then: The user should be found and all properties should match
