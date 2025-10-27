@@ -1,4 +1,4 @@
-package org.bhel.hrm.server.exceptions;
+package org.bhel.hrm.common.exceptions;
 
 /**
  * Thrown when a requested user cannot be found in the system.

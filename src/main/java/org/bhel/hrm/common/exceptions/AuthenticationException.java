@@ -1,4 +1,4 @@
-package org.bhel.hrm.server.exceptions;
+package org.bhel.hrm.common.exceptions;
 
 /**
  * Thrown when a user provides invalid credentials (e.g., unknown username or wrong password).

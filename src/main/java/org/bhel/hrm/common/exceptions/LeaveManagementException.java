@@ -1,4 +1,4 @@
-package org.bhel.hrm.server.exceptions;
+package org.bhel.hrm.common.exceptions;
 
 /**
  * Thrown for any business rule violation related to leave management,

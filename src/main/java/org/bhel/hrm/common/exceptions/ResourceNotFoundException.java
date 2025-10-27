@@ -1,4 +1,4 @@
-package org.bhel.hrm.server.exceptions;
+package org.bhel.hrm.common.exceptions;
 
 /**
  * A generic exception for when any entity (e.g., Employee, Leave Application)

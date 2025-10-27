@@ -1,9 +1,9 @@
 package org.bhel.hrm.common.services;
 
 import org.bhel.hrm.common.dtos.*;
-import org.bhel.hrm.server.exceptions.AuthenticationException;
-import org.bhel.hrm.server.exceptions.DataAccessLayerException;
-import org.bhel.hrm.server.exceptions.DuplicateUserException;
+import org.bhel.hrm.common.exceptions.AuthenticationException;
+import org.bhel.hrm.common.exceptions.DataAccessLayerException;
+import org.bhel.hrm.common.exceptions.DuplicateUserException;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

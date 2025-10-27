@@ -1,4 +1,4 @@
-package org.bhel.hrm.server.exceptions;
+package org.bhel.hrm.common.exceptions;
 
 /**
  * A base, checked exception for the HRM application, used for recoverable errors

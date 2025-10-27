@@ -1,7 +1,7 @@
 package org.bhel.hrm.server.daos;
 
 import org.bhel.hrm.server.DatabaseManager;
-import org.bhel.hrm.server.exceptions.DataAccessLayerException;
+import org.bhel.hrm.common.exceptions.DataAccessLayerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -6,10 +6,10 @@ import org.bhel.hrm.server.daos.EmployeeDAO;
 import org.bhel.hrm.server.daos.UserDAO;
 import org.bhel.hrm.server.domain.Employee;
 import org.bhel.hrm.server.domain.User;
-import org.bhel.hrm.server.exceptions.AuthenticationException;
-import org.bhel.hrm.server.exceptions.DataAccessLayerException;
-import org.bhel.hrm.server.exceptions.DuplicateUserException;
-import org.bhel.hrm.server.exceptions.UserNotFoundException;
+import org.bhel.hrm.common.exceptions.AuthenticationException;
+import org.bhel.hrm.common.exceptions.DataAccessLayerException;
+import org.bhel.hrm.common.exceptions.DuplicateUserException;
+import org.bhel.hrm.common.exceptions.UserNotFoundException;
 import org.bhel.hrm.server.mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,6 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 public class HRMServer extends UnicastRemoteObject implements HRMService {
     private static final Logger logger = LoggerFactory.getLogger(HRMServer.class);
