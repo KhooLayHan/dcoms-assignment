@@ -19,6 +19,9 @@ public class PasswordService {
      * @return The resulting hash string, which includes the algorithm, parameters, salt, and hash.
      */
     public static String hashPassword(String plainTextPassword) {
+        if (plainTextPassword == null)
+            throw new IllegalArgumentException("plainTextPassword must not be null.");
+
         return Password.hash(plainTextPassword).withArgon2().getResult();
     }
 
