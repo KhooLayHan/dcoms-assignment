@@ -33,7 +33,7 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
     }
 
     @Override
-    public UserDTO authenticateUser(String username, String password) throws RemoteException, AuthenticationException, DataAccessLayerException {
+    public UserDTO authenticateUser(String username, String password) throws RemoteException, AuthenticationException {
         logger.info("Authentication attempt for user: {}.", username);
 
         try {

@@ -28,7 +28,7 @@ public interface HRMService extends Remote {
      * @return A UserDTO if authentication is successful, otherwise null.
      * @throws RemoteException if a communication-related error occurs.
      */
-    UserDTO authenticateUser(String username, String password) throws RemoteException, AuthenticationException, DataAccessLayerException;
+    UserDTO authenticateUser(String username, String password) throws RemoteException, AuthenticationException;
 
     // --- 2. Employee Management (Primarily for HR Staff) ---
 
