@@ -248,5 +248,7 @@ gradle-app.setting
 *.hprof
 
 # Configuration files
-*.properties
+config.properties
+psw4j.properties
+!*.properties.example
 .env
