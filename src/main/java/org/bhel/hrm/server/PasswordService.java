@@ -4,7 +4,7 @@ import com.password4j.Password;
 
 /**
  * A utility class for securely hashing and verifying passwords using the Password4j library.
- * This service automatically uses the best-configured algorithm from psw4j.properties (defaults to Argon2id).
+ * This service uses Argon2id with parameters from psw4j.properties (defaults to Argon2id).
  */
 public class PasswordService {
     private PasswordService() {
