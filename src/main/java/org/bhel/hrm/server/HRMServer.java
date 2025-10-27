@@ -91,7 +91,7 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
             try {
                 dbManager.rollbackTransaction();
             } catch (Exception rollbackException) {
-                logger.error("Rollback failed during exception handling.", rollbackException);
+                logger.error("Rollback failed during exception handling of duplicated user.", rollbackException);
             }
 
             throw e;
@@ -101,7 +101,7 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
             try {
                 dbManager.rollbackTransaction();
             } catch (Exception rollbackException) {
-                logger.error("Rollback failed during exception handling.", rollbackException);
+                logger.error("Rollback failed during exception handling of data access layer.", rollbackException);
             }
 
             throw new RemoteException("Employee registration failed due to a server-side error.", e);
