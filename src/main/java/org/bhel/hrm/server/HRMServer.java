@@ -42,17 +42,17 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
 
             boolean passwordMatches = PasswordService.checkPassword(password, user.getPasswordHash());
             if (!passwordMatches)
-                throw new AuthenticationException("Invalid password provided.");
+                throw new AuthenticationException(username);
 
             logger.info("User '{}' authenticated successfully.", username);
             return UserMapper.mapToDto(user);
 
         } catch (UserNotFoundException | AuthenticationException e) {
-            logger.warn("Authentication failed for user '{}': {}", username, e.getMessage()); // Issue here
-            throw new AuthenticationException("Invalid username or password"); // Issue here
+            logger.warn("Authentication failed for user '{}'.", username); // Issue here
+            throw new AuthenticationException(username); // Issue here
         } catch (DataAccessLayerException e) {
             logger.error("A database error occurred during authentication for user '{}'.", username, e); // Issue here
-            throw new RemoteException("Server error during authentication.", e); // Issue here
+            throw new DataAccessLayerException("Server error during authentication.", e); // Issue here
         }
     }
 

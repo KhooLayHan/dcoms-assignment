@@ -25,7 +25,8 @@ public interface HRMService extends Remote {
      *
      * @param username The user's username.
      * @param password The user's raw password.
-     * @return A UserDTO if authentication is successful, otherwise null.
+     * @return A UserDTO if authentication is successful
+     * @throws AuthenticationException on authentication failure.
      * @throws RemoteException if a communication-related error occurs.
      */
     UserDTO authenticateUser(String username, String password) throws RemoteException, AuthenticationException;

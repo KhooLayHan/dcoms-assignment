@@ -22,4 +22,8 @@ public final class AuthenticationException extends HRMException {
         super("Invalid username or password.", cause);
         this.username = username;
     }
+
+    public String getUsername() {
+        return username;
+    }
 }
