@@ -60,12 +60,12 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
     public void registerNewEmployee(NewEmployeeRegistrationDTO registrationData) throws RemoteException, DuplicateUserException {
         logger.info("Attempting to register new employee: {}.", registrationData.username());
 
-        // Business rule check: Does the user already exist?
-        if (userDAO.findByUsername(registrationData.username()).isPresent())
-            throw new DuplicateUserException(registrationData.username());
-
         try {
             dbManager.beginTransaction();
+
+            // Business rule check: Does the user already exist?
+            if (userDAO.findByUsername(registrationData.username()).isPresent())
+                throw new DuplicateUserException(registrationData.username());
 
             User newUser = new User(
                 registrationData.username(),
