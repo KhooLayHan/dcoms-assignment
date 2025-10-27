@@ -7,14 +7,14 @@ package org.bhel.hrm.common.exceptions;
  * This exception should be used to wrap underlying data access failures
  * and propagate them as unchecked exceptions.
  */
-public class DataAccessLayerException extends RuntimeException {
+public class DataAccessException extends RuntimeException {
     /**
-     * Constructs a new DataAccessLayerException with the specified detail message and cause.
+     * Constructs a new DataAccessException with the specified detail message and cause.
      *
      * @param message The detail message explaining the data access error
      * @param cause The underlying cause of the failure (typically a SQLException)
      */
-    public DataAccessLayerException(String message, Throwable cause) {
+    public DataAccessException(String message, Throwable cause) {
         super(message, cause);
     }
 }
