@@ -94,12 +94,21 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
             logger.error("Registration failed for user '{}'. Rolling back transaction.", registrationData.username());
 
             dbManager.rollbackTransaction();
-            throw new RemoteException("Employee registration failed due to a server-side error.");
+            throw new RemoteException("Employee registration failed due to a server-side error.", e);
         } catch (SQLException e) {
             logger.error("SQL error occurred during the registration transaction for user {}. Rolling back transaction.", registrationData.username(), e);
 
-            dbManager.rollbackTransaction();
+            try {
+                dbManager.rollbackTransaction();
+            } catch (Exception rollbackException) {
+                logger.error("Rollback failed during exception handling.", rollbackException);
+            }
+
             throw new RemoteException("Server transaction failed during registration.", e);
+        } finally {
+            // Ensure transaction is closed even if an unexpected exception occurs.
+            if (dbManager.isTransactionActive())
+                dbManager.rollbackTransaction();
         }
     }
 
