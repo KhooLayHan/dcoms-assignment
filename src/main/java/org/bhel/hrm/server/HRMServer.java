@@ -49,9 +49,9 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
 
         } catch (UserNotFoundException | AuthenticationException e) {
             logger.warn("Authentication failed for user '{}'.", username);
-            throw new AuthenticationException(username);
+            throw new AuthenticationException(username, e);
         } catch (DataAccessLayerException e) {
-            logger.error("A database error occurred during authentication for user '{}'.", username);
+            logger.error("A database error occurred during authentication for user '{}'.", username, e);
             throw new RemoteException("Server error during authentication.", e);
         }
     }
@@ -88,12 +88,22 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
         } catch (DuplicateUserException e) {
             logger.info("Registration failed: username '{}' already exists. Rolling back transaction.", registrationData.username());
 
-            dbManager.rollbackTransaction();
+            try {
+                dbManager.rollbackTransaction();
+            } catch (Exception rollbackException) {
+                logger.error("Rollback failed during exception handling.", rollbackException);
+            }
+
             throw e;
         } catch (DataAccessLayerException e) {
             logger.error("Registration failed for user '{}'. Rolling back transaction.", registrationData.username());
 
-            dbManager.rollbackTransaction();
+            try {
+                dbManager.rollbackTransaction();
+            } catch (Exception rollbackException) {
+                logger.error("Rollback failed during exception handling.", rollbackException);
+            }
+
             throw new RemoteException("Employee registration failed due to a server-side error.", e);
         } catch (SQLException e) {
             logger.error("SQL error occurred during the registration transaction for user {}. Rolling back transaction.", registrationData.username(), e);
