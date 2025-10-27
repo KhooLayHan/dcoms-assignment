@@ -24,7 +24,7 @@ public class PasswordService {
 
     /**
      * Verifies a plain-text password against a stored hash.
-     * The library automatically detects the algorithm (BCrypt, Scrypt, Argon2id) from the hash string.
+     * Verifies against Argon2id hashes only.
      *
      * @param plainTextPassword The password provided by the user during login.
      * @param storedHash The hash retrieved from the database.
