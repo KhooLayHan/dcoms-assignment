@@ -48,11 +48,11 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
             return UserMapper.mapToDto(user);
 
         } catch (UserNotFoundException | AuthenticationException e) {
-            logger.warn("Authentication failed for user '{}'.", username); // Issue here
-            throw new AuthenticationException(username); // Issue here
+            logger.warn("Authentication failed for user '{}'.", username);
+            throw new AuthenticationException(username);
         } catch (DataAccessLayerException e) {
-            logger.error("A database error occurred during authentication for user '{}'.", username, e); // Issue here
-            throw new DataAccessLayerException("Server error during authentication.", e); // Issue here
+            logger.error("A database error occurred during authentication for user '{}'.", username);
+            throw new RemoteException("Server error during authentication.", e);
         }
     }
 
@@ -68,23 +68,28 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
                 throw new DuplicateUserException(registrationData.username());
 
             User newUser = new User(
-                registrationData.username(),
-                PasswordService.hashPassword(registrationData.initialPassword()),
-                registrationData.role()
+                    registrationData.username(),
+                    PasswordService.hashPassword(registrationData.initialPassword()),
+                    registrationData.role()
             );
             userDAO.save(newUser);
 
             Employee newEmployee = new Employee(
-                newUser.getId(),
-                registrationData.firstName(),
-                registrationData.lastName(),
-                registrationData.icPassport()
+                    newUser.getId(),
+                    registrationData.firstName(),
+                    registrationData.lastName(),
+                    registrationData.icPassport()
             );
             employeeDAO.save(newEmployee);
 
             dbManager.commitTransaction();
             logger.info("Successfully registered the new Employee {} with user ID {}.", newEmployee.getFirstName(), newEmployee.getId());
 
+        } catch (DuplicateUserException e) {
+            logger.info("Registration failed: username '{}' already exists. Rolling back transaction.", registrationData.username());
+
+            dbManager.rollbackTransaction();
+            throw e;
         } catch (DataAccessLayerException e) {
             logger.error("Registration failed for user '{}'. Rolling back transaction.", registrationData.username());
 
@@ -110,12 +115,12 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
 
     @Override
     public void updateEmployeeProfile(EmployeeDTO employeeDTO) throws RemoteException {
-        throw new UnsupportedOperationException("not yet implemented");
+        throw new RemoteException("not yet implemented");
     }
 
     @Override
     public void applyForLeave(LeaveApplicationDTO leaveApplicationDTO) throws RemoteException {
-        throw new UnsupportedOperationException("not yet implemented");
+        throw new RemoteException("not yet implemented");
     }
 
     @Override
@@ -130,7 +135,7 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
 
     @Override
     public void enrollInTraining(int employeeId, int courseId) throws RemoteException {
-        throw new UnsupportedOperationException("not yet implemented");
+        throw new RemoteException("not yet implemented");
     }
 
     @Override
@@ -150,6 +155,6 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
 
     @Override
     public void enrollInBenefitPlan(int employeeId, int planId) throws RemoteException {
-        throw new UnsupportedOperationException("not yet implemented");
+        throw new RemoteException("not yet implemented");
     }
 }

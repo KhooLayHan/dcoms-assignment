@@ -2,7 +2,6 @@ package org.bhel.hrm.common.services;
 
 import org.bhel.hrm.common.dtos.*;
 import org.bhel.hrm.common.exceptions.AuthenticationException;
-import org.bhel.hrm.common.exceptions.DataAccessLayerException;
 import org.bhel.hrm.common.exceptions.DuplicateUserException;
 
 import java.rmi.Remote;
@@ -140,6 +139,4 @@ public interface HRMService extends Remote {
      * @throws RemoteException if enrollment fails or a communication error occurs.
      */
     void enrollInBenefitPlan(int employeeId, int planId) throws RemoteException;
-
-    // TODO: Add any additional remote methods you need here.
 }
