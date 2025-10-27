@@ -6,6 +6,8 @@ package org.bhel.hrm.common.exceptions;
  * This exception indicates an authentication failure due to incorrect login details.
  */
 public final class AuthenticationException extends HRMException {
+    private final String username;
+
     /**
      * Constructs an AuthenticationException for the specified username.
      *
@@ -13,5 +15,11 @@ public final class AuthenticationException extends HRMException {
      */
     public AuthenticationException(String username) {
         super("Invalid username or password.");
+        this.username = username;
+    }
+
+    public AuthenticationException(String username, Throwable cause) {
+        super("Invalid username or password.", cause);
+        this.username = username;
     }
 }
