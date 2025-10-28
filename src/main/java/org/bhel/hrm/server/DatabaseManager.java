@@ -37,12 +37,22 @@ public final class DatabaseManager {
         if (transactionConnection.get() != null)
             throw new SQLException("Transaction is already active on this thread.");
 
-        @SuppressWarnings("java:S2095")
-        Connection conn = DriverManager.getConnection(config.getDbUrl(), config.getDbUser(), config.getDbPassword());
-        conn.setAutoCommit(false);
+//        @SuppressWarnings("java:S2095")
+        try {
+            Connection conn = DriverManager.getConnection(config.getDbUrl(), config.getDbUser(), config.getDbPassword();
+            conn.setAutoCommit(false);
 
-        transactionConnection.set(conn);
-        logger.debug("Transaction started for Thread [{}]", Thread.currentThread().getName());
+            transactionConnection.set(conn);
+            logger.debug("Transaction started for Thread [{}]", Thread.currentThread().getName());
+        } finally {
+            closeTransactionConnection();
+        }
+
+//        Connection conn = DriverManager.getConnection(config.getDbUrl(), config.getDbUser(), config.getDbPassword());
+//        conn.setAutoCommit(false);
+//
+//        transactionConnection.set(conn);
+//        logger.debug("Transaction started for Thread [{}]", Thread.currentThread().getName());
     }
 
     public void commitTransaction() throws SQLException {
