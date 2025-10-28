@@ -1,4 +1,4 @@
-package org.bhel.hrm.server.daos.utils;
+package org.bhel.hrm.common.utils;
 
 import com.mysql.cj.jdbc.exceptions.CommunicationsException;
 import org.bhel.hrm.common.exceptions.*;

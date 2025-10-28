@@ -1,20 +1,16 @@
 package org.bhel.hrm.common.utils;
 
-import org.bhel.hrm.common.exceptions.DataIntegrityViolationException;
-import org.bhel.hrm.common.exceptions.DuplicateUserException;
-import org.bhel.hrm.common.exceptions.HRMException;
-import org.bhel.hrm.common.exceptions.InvalidInputException;
-import org.bhel.hrm.common.services.HRMService;
+import org.bhel.hrm.common.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
 
-public class ExceptionHandler {
-    private static final Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
+public class GlobalExceptionHandler {
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    private ExceptionHandler() {
-        throw new UnsupportedOperationException("This class ExceptionHandler is a utility class; it should not be instantiated.");
+    private GlobalExceptionHandler() {
+        throw new UnsupportedOperationException("This class GlobalExceptionHandler is a utility class; it should not be instantiated.");
     }
 
     public static void handle(Exception e, String context) throws RemoteException, HRMException {
@@ -31,12 +27,13 @@ public class ExceptionHandler {
             if (context.contains("registration"))
                 throw new DuplicateUserException("An employee with the same details may already exist.");
             else if (context.contains("update"))
-                throw new InvalidInputException("The update violates a data constraint");
-
-            switch (context.contains()) {
-                case context.contains("registration" -> throw new DuplicateUserException("An employee with the same details may already exist.");
-                case "update"
-            }
+                throw new InvalidInputException("The update violates a data constraint.");
+            else
+                throw new HRMException("A data conflict occurred. Please check with your input and try again.");
         }
+
+        // Handle all other unexpected, unrecoverable exceptions (DataAccessException, SQLException, etc.)
+        logger.error("A critical, unrecoverable error occurred during {}", context, e);
+        throw new RemoteException("A server-side error occurred: " + e.getMessage(), e);
     }
 }
