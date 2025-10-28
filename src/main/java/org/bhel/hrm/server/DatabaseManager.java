@@ -37,12 +37,22 @@ public final class DatabaseManager {
         if (transactionConnection.get() != null)
             throw new SQLException("Transaction is already active on this thread.");
 
-        @SuppressWarnings("java:S2095")
-        Connection conn = DriverManager.getConnection(config.getDbUrl(), config.getDbUser(), config.getDbPassword());
-        conn.setAutoCommit(false);
+//        @SuppressWarnings("java:S2095")
+        try {
+            Connection conn = DriverManager.getConnection(config.getDbUrl(), config.getDbUser(), config.getDbPassword();
+            conn.setAutoCommit(false);
 
-        transactionConnection.set(conn);
-        logger.debug("Transaction started for Thread [{}]", Thread.currentThread().getName());
+            transactionConnection.set(conn);
+            logger.debug("Transaction started for Thread [{}]", Thread.currentThread().getName());
+        } finally {
+            closeTransactionConnection();
+        }
+
+//        Connection conn = DriverManager.getConnection(config.getDbUrl(), config.getDbUser(), config.getDbPassword());
+//        conn.setAutoCommit(false);
+//
+//        transactionConnection.set(conn);
+//        logger.debug("Transaction started for Thread [{}]", Thread.currentThread().getName());
     }
 
     public void commitTransaction() throws SQLException {
@@ -135,6 +145,8 @@ public final class DatabaseManager {
                 username VARCHAR(255) NOT NULL UNIQUE,
                 password_hash VARCHAR(255) NOT NULL,
                 role_id TINYINT UNSIGNED NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
                 CONSTRAINT fk_users_role_id
                     FOREIGN KEY (role_id) REFERENCES user_roles(id)
@@ -151,6 +163,10 @@ public final class DatabaseManager {
                 first_name VARCHAR(255) NOT NULL,
                 last_name VARCHAR(255) NOT NULL,
                 ic_passport VARCHAR(255) NOT NULL UNIQUE,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+                CONSTRAINT uk_employees_first_last UNIQUE (first_name, last_name),
 
                 CONSTRAINT fk_employees_employee_id
                     FOREIGN KEY (user_id) REFERENCES users(id)
@@ -199,6 +215,8 @@ public final class DatabaseManager {
                 type_id TINYINT UNSIGNED NOT NULL,
                 status_id TINYINT UNSIGNED NOT NULL,
                 reason TEXT,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         
                 CONSTRAINT fk_leave_applications_employee_id
                     FOREIGN KEY (employee_id) REFERENCES employees(id)
@@ -224,7 +242,9 @@ public final class DatabaseManager {
                 title VARCHAR(255) NOT NULL,
                 description TEXT,
                 duration_in_hours INT,
-                department VARCHAR(255)
+                department VARCHAR(255),
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
         """);
 
@@ -235,7 +255,9 @@ public final class DatabaseManager {
                 plan_name VARCHAR(255) NOT NULL,
                 provider VARCHAR(255),
                 description TEXT,
-                cost_per_month DECIMAL(10, 2)
+                cost_per_month DECIMAL(10, 2),
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
         """);
 
@@ -262,6 +284,8 @@ public final class DatabaseManager {
                 description TEXT,
                 department VARCHAR(255),
                 status_id TINYINT UNSIGNED NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
                 CONSTRAINT fk_job_openings_status_id
                     FOREIGN KEY (status_id) REFERENCES job_opening_statuses(id)
@@ -297,6 +321,8 @@ public final class DatabaseManager {
                 email VARCHAR(255) NOT NULL,
                 phone VARCHAR(50),
                 status_id TINYINT UNSIGNED NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
                 CONSTRAINT fk_applicants_job_opening_id
                     FOREIGN KEY (job_opening_id) REFERENCES job_openings(id)
