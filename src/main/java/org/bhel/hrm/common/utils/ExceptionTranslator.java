@@ -19,7 +19,7 @@ public class ExceptionTranslator {
     }
 
     private static DataAccessException errorCodeMapper(String message, SQLException ex, Integer errorCode) {
-        if (errorCode == null || errorCode == 0)
+        if (errorCode == 0)
             throw new DataAccessException(message, ex);
 
         return switch (errorCode) {
