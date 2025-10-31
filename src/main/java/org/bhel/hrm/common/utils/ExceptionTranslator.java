@@ -11,18 +11,16 @@ public class ExceptionTranslator {
     }
 
     public static DataAccessException translate(String message, SQLException ex) {
-        // MySQL Vendor Error Code: https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html
-        int errorCode = ex.getErrorCode();
-
+        // MySQL Vendor Error Codes: https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html
         if (ex instanceof CommunicationsException)
-            return errorCodeMapper(message, ex, errorCode);
+            return new DataAccessResourceFailureException(message, ex);
 
-        return new DataAccessException(message, ex);
+        return errorCodeMapper(message, ex, ex.getErrorCode());
     }
 
     private static DataAccessException errorCodeMapper(String message, SQLException ex, Integer errorCode) {
-        if (errorCode == null)
-            throw new IllegalStateException("MySQL's vendor error code is NULL.");
+        if (errorCode == null || errorCode == 0)
+            throw new DataAccessException(message, ex);
 
         return switch (errorCode) {
             // --- 1. Connection / Resource Failure Errors ---
@@ -34,6 +32,9 @@ public class ExceptionTranslator {
 
             // Duplicate entry for UNIQUE constraint
             case 1062 -> new DataIntegrityViolationException("Duplicate entry violation: " + message, ex);
+
+            // Column cannot be null / missing defaults
+            case 1048, 1364 -> new DataIntegrityViolationException("Constraint violation: " + message, ex);
 
             // Foreign key constraint fails
             case 1451, 1452 -> new DataIntegrityViolationException("Foreign key constraint violation: " + message, ex);
