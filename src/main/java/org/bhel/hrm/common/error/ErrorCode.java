@@ -43,11 +43,12 @@ public enum ErrorCode {
     // --- Database ---
 
     DB_CONNECTION_FAILED("HRM-DB-001", "Database connection failed", 503),
-    DB_DUPLICATE_ENTRY("HRM-DB-002", "Duplicate entry violates unique constraint", 409),
-    DB_FOREIGN_KEY_VIOLATION("HRM-DB-003", "Operation violates referential integrity", 409),
-    DB_DEADLOCK("HRM-DB-004", "Database deadlock detected", 409),
-    DB_LOCK_TIMEOUT("HRM-DB-005", "Database lock timeout", 408),
-    DB_QUERY_ERROR("HRM-DB-006", "Database query error", 500),
+    DB_COLUMN_IS_NULL("HRM-DB-002", "Column entry violates null constraint ", 409),
+    DB_DUPLICATE_ENTRY("HRM-DB-003", "Duplicate entry violates unique constraint", 409),
+    DB_FOREIGN_KEY_VIOLATION("HRM-DB-004", "Operation violates referential integrity", 409),
+    DB_DEADLOCK("HRM-DB-005", "Database deadlock detected", 409),
+    DB_LOCK_TIMEOUT("HRM-DB-006", "Database lock timeout", 408),
+    DB_QUERY_ERROR("HRM-DB-007", "Database query error", 500),
 
     // --- Validation ---
 
