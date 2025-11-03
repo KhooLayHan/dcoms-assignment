@@ -1,8 +1,11 @@
 package org.bhel.hrm.common.error;
 
+import com.password4j.Hash;
 import org.bhel.hrm.common.exceptions.*;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -14,7 +17,19 @@ public class ExceptionMappingConfig {
     private final Map<Integer, ExceptionMapping> mysqlMappings;
     private final Map<Integer, ContextBasedMapping> contextMappings;
 
-//    private static final ExceptionMappingConfig
+    private static final ExceptionMappingConfig INSTANCE = new ExceptionMappingConfig();
+
+    private ExceptionMappingConfig() {
+        this.mysqlMappings = new HashMap<>();
+        this.contextMappings = new HashMap<>();
+
+        initializeMySQLMappings();
+        initializeContextMappings();
+    }
+
+    public static ExceptionMappingConfig getInstance() {
+        return INSTANCE;
+    }
 
     private void initializeMySQLMappings() {
         // --- 1. Connection / Resource Failure Errors ---
@@ -100,6 +115,70 @@ public class ExceptionMappingConfig {
         ));
     }
 
+    public DataAccessException translate(SQLException ex, ErrorContext context) {
+        int errorCode = ex.getErrorCode();
+        String operation = context.getOperation();
+
+        ContextBasedMapping contextMapping = findContextMapping(operation, errorCode);
+        if (contextMapping != null) {
+            return contextMapping.createException(
+                contextMapping.errorCode.getDefaultMessage(), ex
+            );
+        }
+
+        // Fallback to general error code mapping
+        ExceptionMapping mapping = mysqlMappings.get(errorCode);
+        if (mapping != null) {
+            return mapping.createException(
+                mapping.errorCode.getDefaultMessage() + " during " + operation,
+                ex
+            );
+        }
+
+        // Default fallback
+        return new DataAccessException(
+            ErrorCode.SYSTEM_ERROR.getDefaultMessage() + " during " + operation,
+            ex
+        );
+    }
+
+    private ContextBasedMapping findContextMapping(String operation, int errorCode) {
+        if (operation == null)
+            return null;
+
+        String key = operation.toLowerCase(Locale.ROOT);
+        ContextBasedMapping mapping = contextMappings.get(key);
+        if (mapping != null && mapping.errorCode.equals(errorCode))
+            return mapping;
+
+        for (Map.Entry<String, ContextBasedMapping> entry : contextMappings.entrySet()) {
+            if (key.contains(entry.getKey()) &&
+                entry.getValue().mysqlErrorCode == errorCode
+            )
+                return entry.getValue();
+        }
+
+        return null;
+    }
+
+    // Adds a custom mapping for a specific error code
+    public void addMapping(
+        int errorCode,
+        ErrorCode appErrorCode,
+        BiFunction<String, SQLException, DataAccessException> factory
+    ) {
+        mysqlMappings.put(errorCode, new ExceptionMapping(appErrorCode, factory));
+    }
+
+    // Adds a context-specific error code
+    public void addContextMappings(
+        String context,
+        int mysqlErrorCode,
+        ErrorCode appErrorCode,
+        BiFunction<String, SQLException, DataAccessException> factory
+    ) {
+        contextMappings.put(context.toLowerCase(), new ContextBasedMapping(mysqlErrorCode, appErrorCode, factory));
+    }
 
     private record ExceptionMapping(
         ErrorCode errorCode,
