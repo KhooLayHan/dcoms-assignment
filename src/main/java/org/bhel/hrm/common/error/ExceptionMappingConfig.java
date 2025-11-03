@@ -14,111 +14,141 @@ import java.util.function.BiFunction;
  * At the moment, only supports MySQL database vendor and custom mapping rules.
  */
 public class ExceptionMappingConfig {
-    private final Map<Integer, ExceptionMapping> mysqlMappings;
-    private final Map<Integer, ContextBasedMapping> contextMappings;
+    public enum DatabaseVendor { MYSQL, POSTGRESQL }
 
-    private static final ExceptionMappingConfig INSTANCE = new ExceptionMappingConfig();
+    private final Map<Integer, ExceptionMapping> errorMappings;
+    private final Map<String, ContextBasedMapping> contextMappings;
 
-    private ExceptionMappingConfig() {
-        this.mysqlMappings = new HashMap<>();
-        this.contextMappings = new HashMap<>();
+    private final DatabaseVendor vendor;
 
-        initializeMySQLMappings();
-        initializeContextMappings();
+    public ExceptionMappingConfig() {
+        this(DatabaseVendor.MYSQL);
     }
 
-    public static ExceptionMappingConfig getInstance() {
-        return INSTANCE;
+    public ExceptionMappingConfig(DatabaseVendor vendor) {
+        this.vendor = vendor;
+        this.errorMappings = new HashMap<>();
+        this.contextMappings = new HashMap<>();
+
+        initializeMappings();
+    }
+
+    private void initializeMappings() {
+        switch (vendor) {
+            case MYSQL -> initializeMySQLMappings();
+            case POSTGRESQL -> initializePostGreSQLMappings();
+        }
     }
 
     private void initializeMySQLMappings() {
         // --- 1. Connection / Resource Failure Errors ---
 
         // Access denied error
-        mysqlMappings.put(1045, new ExceptionMapping(
+        addMapping(
+            1045,
             ErrorCode.AUTH_INVALID_CREDENTIALS,
             DataAccessResourceFailureException::new
-        ));
+        );
 
         // Connection failure error
-        mysqlMappings.put(2013, new ExceptionMapping(
+        addMapping(
+            2013,
             ErrorCode.DB_CONNECTION_FAILED,
             DataAccessResourceFailureException::new
-        ));
+        );
 
         // --- 2. Data Integrity / Constraint Violation Errors ---
 
         // Duplicate entry
-        mysqlMappings.put(1062, new ExceptionMapping(
+        addMapping(
+            1062,
             ErrorCode.DB_DUPLICATE_ENTRY,
             DataIntegrityViolationException::new
-        ));
+        );
 
         // Foreign key constraint fails
-        mysqlMappings.put(1451, new ExceptionMapping(
+        addMapping(
+            1451,
             ErrorCode.DB_FOREIGN_KEY_VIOLATION,
             DataIntegrityViolationException::new
-        ));
+        );
 
-        mysqlMappings.put(1452, new ExceptionMapping(
+        addMapping(
+            1452,
             ErrorCode.DB_FOREIGN_KEY_VIOLATION,
             DataIntegrityViolationException::new
-        ));
+        );
+
+        // Column cannot be null / missing defaults
+        addMapping(
+            1048,
+            ErrorCode.DB_COLUMN_IS_NULL,
+            DataIntegrityViolationException::new
+        );
+
+        addMapping(
+            1364,
+            ErrorCode.DB_COLUMN_IS_NULL,
+            DataIntegrityViolationException::new
+        );
 
         // --- 3. MySQL Grammar Errors ---
 
         // Syntax error
-        mysqlMappings.put(1064, new ExceptionMapping(
+        addMapping(
+            1064,
             ErrorCode.DB_QUERY_ERROR,
             IncorrectSqlGrammarException::new
-        ));
+        );
 
         // --- 4. Locking Errors ---
 
         // Deadlock found
-        mysqlMappings.put(1213, new ExceptionMapping(
+        addMapping(
+            1213,
             ErrorCode.DB_DEADLOCK,
             CannotAcquireLockException::new
-        ));
+        );
 
         // Lock wait timeout
-        mysqlMappings.put(1205, new ExceptionMapping(
+        addMapping(
+            1205,
             ErrorCode.DB_LOCK_TIMEOUT,
             CannotAcquireLockException::new
-        ));
+        );
+
+        // --- 5. Context-specific Errors ---
+        addContextMapping(
+            "registration",
+            1062,
+            ErrorCode.USER_ALREADY_EXISTS,
+            DuplicateUserException::new
+        );
+
+        addContextMapping(
+            "employee.create",
+            1062,
+            ErrorCode.EMPLOYEE_DUPLICATE_ID,
+            DuplicateUserException::new
+        );
+
+        addContextMapping(
+            "employee.delete",
+            1451,
+            ErrorCode.EMPLOYEE_HAS_DEPENDENCIES,
+            DataIntegrityViolationException::new
+        );
     }
 
-    private void initializeContextMappings() {
-        // Registration operations
-        contextMappings.put("registration", new ContextBasedMapping(
-           1062,
-           ErrorCode.USER_ALREADY_EXISTS,
-           DuplicateUserException::new
-        ));
-
-        contextMappings.put("employee.create", new ContextBasedMapping(
-                1062,
-                ErrorCode.EMPLOYEE_DUPLICATE_ID,
-                DuplicateUserException::new
-        ));
-
-        contextMappings.put("employee.delete", new ContextBasedMapping(
-                1062,
-                ErrorCode.EMPLOYEE_HAS_DEPENDENCIES,
-                DataIntegrityViolationException::new
-        ));
-
-        contextMappings.put("update", new ContextBasedMapping(
-                1062,
-                ErrorCode.DB_DUPLICATE_ENTRY,
-                InvalidInputException::new
-        ));
+    private void initializePostGreSQLMappings() {
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     public DataAccessException translate(SQLException ex, ErrorContext context) {
         int errorCode = ex.getErrorCode();
         String operation = context.getOperation();
 
+        // First try context-specific first
         ContextBasedMapping contextMapping = findContextMapping(operation, errorCode);
         if (contextMapping != null) {
             return contextMapping.createException(
@@ -127,7 +157,7 @@ public class ExceptionMappingConfig {
         }
 
         // Fallback to general error code mapping
-        ExceptionMapping mapping = mysqlMappings.get(errorCode);
+        ExceptionMapping mapping = errorMappings.get(errorCode);
         if (mapping != null) {
             return mapping.createException(
                 mapping.errorCode.getDefaultMessage() + " during " + operation,
@@ -142,11 +172,36 @@ public class ExceptionMappingConfig {
         );
     }
 
+    // Adds a custom mapping for a specific error code
+    public void addMapping(
+        int errorCode,
+        ErrorCode appErrorCode,
+        BiFunction<String, SQLException, DataAccessException> factory
+    ) {
+        errorMappings.put(
+            errorCode,
+            new ExceptionMapping(appErrorCode, factory)
+        );
+    }
+
+    // Adds a context-specific error code
+    public void addContextMapping(
+        String context,
+        int mysqlErrorCode,
+        ErrorCode appErrorCode,
+        BiFunction<String, SQLException, DataAccessException> factory
+    ) {
+        contextMappings.put(
+            context.toLowerCase(),
+            new ContextBasedMapping(mysqlErrorCode, appErrorCode, factory)
+        );
+    }
+
     private ContextBasedMapping findContextMapping(String operation, int errorCode) {
         if (operation == null)
             return null;
 
-        String key = operation.toLowerCase(Locale.ROOT);
+        String key = operation.toLowerCase();
         ContextBasedMapping mapping = contextMappings.get(key);
         if (mapping != null && mapping.errorCode.equals(errorCode))
             return mapping;
@@ -159,25 +214,6 @@ public class ExceptionMappingConfig {
         }
 
         return null;
-    }
-
-    // Adds a custom mapping for a specific error code
-    public void addMapping(
-        int errorCode,
-        ErrorCode appErrorCode,
-        BiFunction<String, SQLException, DataAccessException> factory
-    ) {
-        mysqlMappings.put(errorCode, new ExceptionMapping(appErrorCode, factory));
-    }
-
-    // Adds a context-specific error code
-    public void addContextMappings(
-        String context,
-        int mysqlErrorCode,
-        ErrorCode appErrorCode,
-        BiFunction<String, SQLException, DataAccessException> factory
-    ) {
-        contextMappings.put(context.toLowerCase(), new ContextBasedMapping(mysqlErrorCode, appErrorCode, factory));
     }
 
     private record ExceptionMapping(
