@@ -1,11 +1,11 @@
-package org.bhel.hrm.common.error;
+package org.bhel.hrm.common.utils;
 
-import com.password4j.Hash;
+import org.bhel.hrm.common.error.ErrorCode;
+import org.bhel.hrm.common.error.ErrorContext;
 import org.bhel.hrm.common.exceptions.*;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -202,9 +202,9 @@ public class ExceptionMappingConfig {
             return null;
 
         String key = operation.toLowerCase();
-        ContextBasedMapping mapping = contextMappings.get(key);
-        if (mapping != null && mapping.errorCode.equals(errorCode))
-            return mapping;
+        ContextBasedMapping exactMatch = contextMappings.get(key);
+        if (exactMatch != null && exactMatch.mysqlErrorCode == errorCode)
+            return exactMatch;
 
         for (Map.Entry<String, ContextBasedMapping> entry : contextMappings.entrySet()) {
             if (key.contains(entry.getKey()) &&
