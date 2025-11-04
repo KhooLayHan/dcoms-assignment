@@ -69,41 +69,41 @@ public class ErrorResponse implements Serializable {
     }
 
     /**
-     * Builder for ErrorResponse.
+     * ErrorResponseBuilder for ErrorResponse.
      */
-    public static class Builder {
+    public static class ErrorResponseBuilder {
         private String errorId;
         private ErrorCode errorCode;
         private String message;
         private LocalDateTime timestamp;
         private Map<String, Object> details;
 
-        public Builder() {
+        public ErrorResponseBuilder() {
             this.timestamp = LocalDateTime.now();
             this.details = new HashMap<>();
         }
 
-        public Builder errorId(String errorId) {
+        public ErrorResponseBuilder errorId(String errorId) {
             this.errorId = errorId;
             return this;
         }
 
-        public Builder errorCode(ErrorCode errorCode) {
+        public ErrorResponseBuilder errorCode(ErrorCode errorCode) {
             this.errorCode = errorCode;
             return this;
         }
 
-        public Builder message(String message) {
+        public ErrorResponseBuilder message(String message) {
             this.message = message;
             return this;
         }
 
-        public Builder timestamp(LocalDateTime timestamp) {
+        public ErrorResponseBuilder timestamp(LocalDateTime timestamp) {
             this.timestamp = timestamp;
             return this;
         }
 
-        public Builder addDetail(String key, Object value) {
+        public ErrorResponseBuilder addDetail(String key, Object value) {
             this.details.put(key, value);
             return this;
         }

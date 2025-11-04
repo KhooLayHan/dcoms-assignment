@@ -18,7 +18,7 @@ public class ErrorContext {
     private final String ipAddress;
     private final Map<String, Object> additionalData;
 
-    private ErrorContext(Builder builder) {
+    private ErrorContext(ErrorContextBuilder builder) {
         this.errorId = builder.errorId;
         this.timestamp = builder.timestamp;
         this.operation = builder.operation;
@@ -69,18 +69,18 @@ public class ErrorContext {
     }
 
     /**
-     * Creates a new Builder instance.
+     * Creates a new ErrorResponseBuilder instance.
      *
      * @return A builder object.
      */
-    public static Builder builder() {
-        return new Builder();
+    public static ErrorContextBuilder builder() {
+        return new ErrorContextBuilder();
     }
 
     /**
-     * Builder for ErrorContext.
+     * ErrorResponseBuilder for ErrorContext.
      */
-    public static class Builder {
+    public static class ErrorContextBuilder {
         private String errorId;
         private final LocalDateTime timestamp;
         private String operation;
@@ -89,43 +89,43 @@ public class ErrorContext {
         private String ipAddress;
         private final Map<String, Object> additionalData;
 
-        private Builder() {
+        private ErrorContextBuilder() {
             this.errorId = UUID.randomUUID().toString();
             this.timestamp = LocalDateTime.now();
             this.additionalData = new HashMap<>();
         }
 
-        public Builder errorId(String errorId) {
+        public ErrorContextBuilder errorId(String errorId) {
             this.errorId = errorId;
             return this;
         }
 
-        public Builder operation(String operation) {
+        public ErrorContextBuilder operation(String operation) {
             this.operation = operation;
             return this;
         }
 
-        public Builder userId(String userId) {
+        public ErrorContextBuilder userId(String userId) {
             this.userId = userId;
             return this;
         }
 
-        public Builder sessionId(String sessionId) {
+        public ErrorContextBuilder sessionId(String sessionId) {
             this.sessionId = sessionId;
             return this;
         }
 
-        public Builder ipAddress(String ipAddress) {
+        public ErrorContextBuilder ipAddress(String ipAddress) {
             this.ipAddress = ipAddress;
             return this;
         }
 
-        public Builder addData(String key, Object value) {
+        public ErrorContextBuilder addData(String key, Object value) {
             this.additionalData.put(key, value);
             return this;
         }
 
-        public Builder addData(Map<String, Object> data) {
+        public ErrorContextBuilder addData(Map<String, Object> data) {
             this.additionalData.putAll(data);
             return this;
         }
