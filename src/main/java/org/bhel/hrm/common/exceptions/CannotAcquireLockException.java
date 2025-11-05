@@ -1,5 +1,7 @@
 package org.bhel.hrm.common.exceptions;
 
+import org.bhel.hrm.common.error.ErrorCode;
+
 /**
  * A {@link DataAccessException} thrown when a database operation fails
  * because a lock could not be acquired (e.g., due to a timeout or deadlock).
@@ -12,6 +14,10 @@ public final class CannotAcquireLockException extends DataAccessException {
      * @param cause The underlying cause of not acquiring the lock problem
      */
     public CannotAcquireLockException(String message, Throwable cause) {
-        super(message, cause);
+        super(ErrorCode.DB_DEADLOCK, message, cause);
+    }
+
+    public CannotAcquireLockException(ErrorCode errorCode, String message, Throwable cause) {
+        super(errorCode, message, cause);
     }
 }

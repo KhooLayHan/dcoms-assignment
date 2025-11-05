@@ -1,5 +1,7 @@
 package org.bhel.hrm.common.exceptions;
 
+import org.bhel.hrm.common.error.ErrorCode;
+
 /**
  * A {@link DataAccessException} thrown when a critical resource needed
  * for data access fails (e.g., a database connection cannot be established).
@@ -12,6 +14,10 @@ public final class DataAccessResourceFailureException extends DataAccessExceptio
      * @param cause The underlying cause of the resource failure
      */
     public DataAccessResourceFailureException(String message, Throwable cause) {
-        super(message, cause);
+        super(ErrorCode.DB_CONNECTION_FAILED, message, cause);
+    }
+
+    public DataAccessResourceFailureException(ErrorCode errorCode, String message, Throwable cause) {
+        super(errorCode, message, cause);
     }
 }
