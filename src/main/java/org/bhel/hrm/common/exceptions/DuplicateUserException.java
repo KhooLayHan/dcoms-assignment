@@ -43,8 +43,8 @@ public final class DuplicateUserException extends HRMException {
     /**
      * Constructs a DuplicateUserException with context.
      *
-     * @param identifierType The type of identifier
      * @param identifier The identifier value that already exists
+     * @param identifierType The type of identifier
      * @param context The error context
      */
     public DuplicateUserException(String identifier, String identifierType, ErrorContext context) {

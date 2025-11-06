@@ -44,7 +44,11 @@ public class ExceptionMappingConfig {
         addMapping(
             1045,
             ErrorCode.AUTH_INVALID_CREDENTIALS,
-            DataAccessResourceFailureException::new
+            (msg, ex) -> new DataAccessResourceFailureException(
+                ErrorCode.AUTH_INVALID_CREDENTIALS,
+                msg,
+                ex
+            )
         );
 
         // Connection failure error
@@ -67,26 +71,42 @@ public class ExceptionMappingConfig {
         addMapping(
             1451,
             ErrorCode.DB_FOREIGN_KEY_VIOLATION,
-            DataIntegrityViolationException::new
+            (msg, ex) -> new DataIntegrityViolationException(
+                ErrorCode.DB_FOREIGN_KEY_VIOLATION,
+                msg,
+                ex
+            )
         );
 
         addMapping(
             1452,
             ErrorCode.DB_FOREIGN_KEY_VIOLATION,
-            DataIntegrityViolationException::new
+            (msg, ex) -> new DataIntegrityViolationException(
+                ErrorCode.DB_FOREIGN_KEY_VIOLATION,
+                msg,
+                ex
+            )
         );
 
         // Column cannot be null / missing defaults
         addMapping(
             1048,
             ErrorCode.DB_COLUMN_IS_NULL,
-            DataIntegrityViolationException::new
+            (msg, ex) -> new DataIntegrityViolationException(
+                ErrorCode.DB_COLUMN_IS_NULL,
+                msg,
+                ex
+            )
         );
 
         addMapping(
             1364,
             ErrorCode.DB_COLUMN_IS_NULL,
-            DataIntegrityViolationException::new
+            (msg, ex) -> new DataIntegrityViolationException(
+                ErrorCode.DB_COLUMN_IS_NULL,
+                msg,
+                ex
+            )
         );
 
         // --- 3. MySQL Grammar Errors ---
@@ -111,7 +131,11 @@ public class ExceptionMappingConfig {
         addMapping(
             1205,
             ErrorCode.DB_LOCK_TIMEOUT,
-            CannotAcquireLockException::new
+            (msg, ex) -> new CannotAcquireLockException(
+                ErrorCode.DB_LOCK_TIMEOUT,
+                msg,
+                ex
+            )
         );
 
         // --- 5. Context-specific Errors ---
@@ -119,21 +143,33 @@ public class ExceptionMappingConfig {
             "registration",
             1062,
             ErrorCode.USER_ALREADY_EXISTS,
-            DuplicateUserException::new
+            (msg, ex) -> new DataIntegrityViolationException(
+                ErrorCode.USER_ALREADY_EXISTS,
+                msg,
+                ex
+            )
         );
 
         addContextMapping(
             "employee.create",
             1062,
             ErrorCode.EMPLOYEE_DUPLICATE_ID,
-            DuplicateUserException::new
+            (msg, ex) -> new DataIntegrityViolationException(
+                ErrorCode.EMPLOYEE_DUPLICATE_ID,
+                msg,
+                ex
+            )
         );
 
         addContextMapping(
             "employee.delete",
             1451,
             ErrorCode.EMPLOYEE_HAS_DEPENDENCIES,
-            DataIntegrityViolationException::new
+            (msg, ex) -> new DataIntegrityViolationException(
+                ErrorCode.EMPLOYEE_HAS_DEPENDENCIES,
+                msg,
+                ex
+            )
         );
     }
 
@@ -184,13 +220,13 @@ public class ExceptionMappingConfig {
     // Adds a context-specific error code
     public void addContextMapping(
         String context,
-        int mysqlErrorCode,
+        int dbErrorCode,
         ErrorCode appErrorCode,
         BiFunction<String, SQLException, DataAccessException> factory
     ) {
         contextMappings.put(
             context.toLowerCase(),
-            new ContextBasedMapping(mysqlErrorCode, appErrorCode, factory)
+            new ContextBasedMapping(dbErrorCode, appErrorCode, factory)
         );
     }
 
@@ -200,13 +236,13 @@ public class ExceptionMappingConfig {
 
         String key = operation.toLowerCase();
         ContextBasedMapping exactMatch = contextMappings.get(key);
-        if (exactMatch != null && exactMatch.mysqlErrorCode == errorCode)
+        if (exactMatch != null && exactMatch.dbErrorCode == errorCode)
             return exactMatch;
 
         for (Map.Entry<String, ContextBasedMapping> entry : contextMappings.entrySet()) {
             if (
                 key.contains(entry.getKey()) &&
-                entry.getValue().mysqlErrorCode == errorCode
+                entry.getValue().dbErrorCode == errorCode
             )
                 return entry.getValue();
         }
@@ -224,7 +260,7 @@ public class ExceptionMappingConfig {
     }
 
     private record ContextBasedMapping(
-        int mysqlErrorCode,
+        int dbErrorCode,
         ErrorCode errorCode,
         BiFunction<String, SQLException, DataAccessException> exceptionFactory
     ) {

@@ -97,6 +97,9 @@ public final class LeaveManagementException extends HRMException {
     }
 
     public static ErrorCode mapViolationToErrorCode(LeaveViolationType violationType) {
+        if (violationType == null)
+            violationType = LeaveViolationType.UNKNOWN;
+
         return switch (violationType) {
             case INSUFFICIENT_BALANCE -> ErrorCode.LEAVE_INSUFFICIENT_BALANCE;
             case OVERLAPPING_DATES -> ErrorCode.LEAVE_OVERLAPPING_DATES;

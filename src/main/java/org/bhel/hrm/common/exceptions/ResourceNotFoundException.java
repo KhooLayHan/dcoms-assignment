@@ -15,29 +15,42 @@ public final class ResourceNotFoundException extends HRMException {
     private final String resourceType;
 
     /**
-     * Constructs a ResourceNotFoundException with basic message.
+     * Constructs a ResourceNotFoundException with explicit error code.
      *
-     * @param message The detail message
-     */
-    public ResourceNotFoundException(String message) {
-        super(ErrorCode.EMPLOYEE_NOT_FOUND, message);
-        this.resourceId = null;
-        this.resourceType = null;
-    }
-
-    /**
-     * Constructs a ResourceNotFoundException for a specific resource.
-     *
+     * @param errorCode The specific error code (e.g., EMPLOYEE_NOT_FOUND, USER_NOT_FOUND)
      * @param resourceType The type of resource (e.g., "Employee", "Leave Request")
      * @param resourceId The identifier of the resource that was not found
      */
-    public ResourceNotFoundException(String resourceType, Object resourceId) {
+    public ResourceNotFoundException(ErrorCode errorCode, String resourceType, Object resourceId) {
         super(
-            ErrorCode.EMPLOYEE_NOT_FOUND,
+            errorCode,
             formatMessage(resourceType, resourceId)
         );
         this.resourceId = resourceId;
         this.resourceType = resourceType;
+    }
+
+    /**
+     * Constructs a ResourceNotFoundException with error code, resource details, and context.
+     *
+     * @param errorCode The specific error code
+     * @param resourceType The type of resource
+     * @param resourceId The identifier of the resource
+     * @param context The error context
+     */
+    public ResourceNotFoundException(
+        ErrorCode errorCode,
+        String resourceType,
+        Object resourceId,
+        ErrorContext context
+    ) {
+        super(
+            errorCode,
+            formatMessage(resourceType, resourceId),
+            context
+        );
+        this.resourceType = resourceType;
+        this.resourceId = resourceId;
     }
 
     /**

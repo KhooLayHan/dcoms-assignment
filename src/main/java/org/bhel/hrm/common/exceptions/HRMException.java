@@ -38,26 +38,44 @@ public sealed class HRMException extends Exception permits
      * @param message The detail message explaining the exception
      * @param cause The underlying cause of the exception
      */
-    public HRMException(String message, Throwable cause) {
+    public HRMException(
+        String message,
+        Throwable cause
+    ) {
         this(ErrorCode.SYSTEM_ERROR, message, cause, null);
     }
 
-    public HRMException(ErrorCode errorCode, String message) {
+    public HRMException(
+        ErrorCode errorCode,
+        String message
+    ) {
         this(errorCode, message, null, null);
     }
 
-    public HRMException(ErrorCode errorCode, String message, ErrorContext context) {
+    public HRMException(
+        ErrorCode errorCode,
+        String message,
+        ErrorContext context
+    ) {
         this(errorCode, message, null, context);
     }
 
-    public HRMException(ErrorCode errorCode, String message, Throwable cause, ErrorContext context) {
+    public HRMException(
+        ErrorCode errorCode,
+        String message,
+        Throwable cause,
+        ErrorContext context
+    ) {
         super(formatMessage(errorCode, message), cause);
 
         this.errorCode = errorCode;
         this.errorContext = context;
     }
 
-    private static String formatMessage(ErrorCode errorCode, String message) {
+    private static String formatMessage(
+        ErrorCode errorCode,
+        String message
+    ) {
         return String.format("[%s] %s", errorCode.getCode(), message);
     }
 

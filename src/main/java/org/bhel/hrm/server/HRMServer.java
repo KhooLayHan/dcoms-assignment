@@ -153,6 +153,9 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
 
     @Override
     public void updateEmployeeProfile(EmployeeDTO employeeDTO) throws RemoteException, ResourceNotFoundException, InvalidInputException {
+        if (employeeDTO == null)
+            throw new InvalidInputException("EmployeeDTO is null");
+
         logger.info("RMI Call: updateEmployeeProfile() for employee ID: {}", employeeDTO.id());
 
         try {
@@ -180,11 +183,18 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
                 logger.warn("Update failed for employee ID {}. An existing employee with the name already exists.", employeeDTO.id());
                 throw new InvalidInputException("An employee with this first and last name already exists.");
             }
+
+            // Re-throw as RemoteException to signal failure
+            logger.error("Data-access error during profile update for ID: {}", employeeDTO.id(), e);
+            throw new RemoteException("Server error: Could not update employee profile.", e);
         } catch (SQLException e) {
             dbManager.rollbackTransaction();
 
             logger.error("A transaction error occurred during an employee profile update for ID: {}", employeeDTO.id());
             throw new RemoteException("Server transaction failed during profile update.", e);
+        } finally {
+            if (dbManager.isTransactionActive())
+                dbManager.rollbackTransaction();
         }
     }
 

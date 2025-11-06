@@ -14,10 +14,6 @@ public class GlobalExceptionHandler {
     private final ExceptionMappingConfig mappingConfig;
     private final ErrorMessageProvider messageProvider;
 
-//    private GlobalExceptionHandler() {
-//        throw new UnsupportedOperationException("This class GlobalExceptionHandler is a utility class; it should not be instantiated.");
-//    }
-
     public GlobalExceptionHandler(
         ExceptionMappingConfig mappingConfig,
         ErrorMessageProvider messageProvider
@@ -49,9 +45,8 @@ public class GlobalExceptionHandler {
         }
 
         // 2. Handle specific and expected database errors and translate them into business exceptions.
-        if (e instanceof SQLException) {
-            handleSQLException((SQLException) e, context);
-            throw (SQLException) e;
+        if (e instanceof SQLException sqlException) {
+            handleSQLException(sqlException, context);
         }
 
         // 3. Handle all other unexpected, unrecoverable exceptions

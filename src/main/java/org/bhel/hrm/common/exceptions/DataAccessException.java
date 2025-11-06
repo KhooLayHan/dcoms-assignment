@@ -26,22 +26,37 @@ public sealed class DataAccessException extends RuntimeException permits
      * @param message The detail message explaining the data access error
      * @param cause The underlying cause of the failure (typically a SQLException)
      */
-    public DataAccessException(String message, Throwable cause) {
+    public DataAccessException(
+        String message,
+        Throwable cause
+    ) {
         this(ErrorCode.DB_QUERY_ERROR, message, cause, null);
     }
 
-    public DataAccessException(ErrorCode errorCode, String message, Throwable cause) {
+    public DataAccessException(
+        ErrorCode errorCode,
+        String message,
+        Throwable cause
+    ) {
         this(errorCode, message, cause, null);
     }
 
-    public DataAccessException(ErrorCode errorCode, String message, Throwable cause, ErrorContext context) {
+    public DataAccessException(
+        ErrorCode errorCode,
+        String message,
+        Throwable cause,
+        ErrorContext context
+    ) {
         super(formatMessage(errorCode, message), cause);
 
         this.errorCode = errorCode;
         this.errorContext = context;
     }
 
-    private static String formatMessage(ErrorCode errorCode, String message) {
+    private static String formatMessage(
+        ErrorCode errorCode,
+        String message
+    ) {
         return String.format("[%s] %s", errorCode.getCode(), message);
     }
 
