@@ -3,8 +3,6 @@ package org.bhel.hrm.common.exceptions;
 import org.bhel.hrm.common.error.ErrorCode;
 import org.bhel.hrm.common.error.ErrorContext;
 
-import java.sql.SQLException;
-
 /**
  * Thrown when attempting to create a user with a username that already exists.
  * <p>
