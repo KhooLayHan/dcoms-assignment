@@ -1,9 +1,13 @@
 package org.bhel.hrm.common.error;
 
 import org.bhel.hrm.common.exceptions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -12,6 +16,8 @@ import java.util.function.BiFunction;
  * At the moment, only supports MySQL database vendor and custom mapping rules.
  */
 public class ExceptionMappingConfig {
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionMappingConfig.class);
+
     public enum DatabaseVendor { MYSQL, POSTGRESQL }
 
     private final Map<Integer, ExceptionMapping> errorMappings;
@@ -224,8 +230,28 @@ public class ExceptionMappingConfig {
         ErrorCode appErrorCode,
         BiFunction<String, SQLException, DataAccessException> factory
     ) {
+        if (context == null || context.isEmpty()) {
+            throw new IllegalArgumentException("Context cannot be null or empty");
+        }
+
+        String normalizedContext = context.toLowerCase();
+
+        // Warns about potential substring conflicts
+        for (String existingContext : contextMappings.keySet()) {
+            if (
+                normalizedContext.contains(existingContext) ||
+                existingContext.contains(normalizedContext)
+            ) {
+                logger.warn(
+                    "Context '{}' may conflict with existing context '{}'. " +
+                    "Ensure this is intentional. Longest match will be used.",
+                    normalizedContext, existingContext
+                );
+            }
+        }
+
         contextMappings.put(
-            context.toLowerCase(),
+            normalizedContext,
             new ContextBasedMapping(dbErrorCode, appErrorCode, factory)
         );
     }
@@ -235,24 +261,55 @@ public class ExceptionMappingConfig {
             return null;
 
         String key = operation.toLowerCase();
-        ContextBasedMapping exactMatch = contextMappings.get(key);
-        if (exactMatch != null && exactMatch.dbErrorCode == errorCode)
-            return exactMatch;
 
-        for (Map.Entry<String, ContextBasedMapping> entry : contextMappings.entrySet()) {
-//            contextMappings.entrySet().stream()
-//                .sorted((e1, e2)
-//                    -> Integer.compare(e2.getKey().length(), e1.getKey().length()))
-//                .forEach(ent -> {
-                    if (
-                        key.contains(entry.getKey()) &&
-                        entry.getValue().dbErrorCode == errorCode
-                    )
-                        return entry.getValue();
-//                };
+        // Step 1: Try exact match first (highest priority)
+        ContextBasedMapping exactMatch = contextMappings.get(key);
+        if (exactMatch != null && exactMatch.dbErrorCode == errorCode) {
+            logger.debug("Found exact context match: '{}'", key);
+            return exactMatch;
         }
 
-        return null;
+        // Step 2: Find all matching contexts and sort by length (longest first)
+        List<Map.Entry<String, ContextBasedMapping>> matches = new ArrayList<>();
+
+        for (Map.Entry<String, ContextBasedMapping> entry : contextMappings.entrySet()) {
+            String contextKey = entry.getKey();
+            ContextBasedMapping mapping = entry.getValue();
+
+            // Check if this context is a prefix of the operation AND error code matches
+            if (key.startsWith(contextKey) && mapping.dbErrorCode == errorCode) {
+                matches.add(entry);
+            }
+        }
+
+        // If no matches found, return null
+        if (matches.isEmpty()) {
+            logger.debug("No context match found for operation='{}', errorCode={}", operation, errorCode);
+            return null;
+        }
+
+        // Sort by key length (longest first) for most specific match
+        // If lengths are equal, sort alphabetically for determinism
+        matches.sort((e1, e2) -> {
+            int lengthCompare = Integer.compare(
+                e2.getKey().length(),
+                e1.getKey().length()
+            );
+
+            if (lengthCompare != 0) {
+                return lengthCompare;
+            }
+
+            // Same length - sort alphabetically for determinism
+            return e1.getKey().compareTo(e2.getKey());
+        });
+
+        // Return the longest (most specific) match
+        Map.Entry<String, ContextBasedMapping> bestMatch = matches.getFirst();
+        logger.debug("Found prefix match: '{}' for operation '{}'",
+            bestMatch.getKey(), operation);
+
+        return bestMatch.getValue();
     }
 
     private record ExceptionMapping(
