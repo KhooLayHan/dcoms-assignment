@@ -3,6 +3,8 @@ package org.bhel.hrm.common.services;
 import org.bhel.hrm.common.dtos.*;
 import org.bhel.hrm.common.exceptions.AuthenticationException;
 import org.bhel.hrm.common.exceptions.DuplicateUserException;
+import org.bhel.hrm.common.exceptions.InvalidInputException;
+import org.bhel.hrm.common.exceptions.ResourceNotFoundException;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -54,8 +56,9 @@ public interface HRMService extends Remote {
      * @param employeeId The ID of the employee to fetch.
      * @return An EmployeeDTO containing the employee's details.
      * @throws RemoteException if the employee is not found or a communication error occurs.
+     * @throws ResourceNotFoundException if the employee resource is not found.
      */
-    EmployeeDTO getEmployeeById(int employeeId) throws RemoteException;
+    EmployeeDTO getEmployeeById(int employeeId) throws RemoteException, ResourceNotFoundException;
 
     /**
      * Updates the profile information for an existing employee.
@@ -63,7 +66,7 @@ public interface HRMService extends Remote {
      * @param employeeDTO The DTO containing the updated information. The ID must be valid.
      * @throws RemoteException if the update fails or a communication error occurs.
      */
-    void updateEmployeeProfile(EmployeeDTO employeeDTO) throws RemoteException;
+    void updateEmployeeProfile(EmployeeDTO employeeDTO) throws RemoteException, ResourceNotFoundException, InvalidInputException;
 
     // --- 3. Leave Management (For Employees and HR) ---
 

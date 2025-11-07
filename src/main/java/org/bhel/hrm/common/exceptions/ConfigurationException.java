@@ -8,6 +8,15 @@ package org.bhel.hrm.common.exceptions;
  */
 public class ConfigurationException extends RuntimeException {
     /**
+     * Constructs a ConfigurationException with message.
+     *
+     * @param message The detail message explaining the configuration error
+     */
+    public ConfigurationException(String message) {
+        super(message);
+    }
+
+    /**
      * Constructs a ConfigurationException with the specified detail message and cause.
      *
      * @param message The detail message explaining the configuration error
