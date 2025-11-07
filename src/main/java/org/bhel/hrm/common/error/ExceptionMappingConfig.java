@@ -240,11 +240,16 @@ public class ExceptionMappingConfig {
             return exactMatch;
 
         for (Map.Entry<String, ContextBasedMapping> entry : contextMappings.entrySet()) {
-            if (
-                key.contains(entry.getKey()) &&
-                entry.getValue().dbErrorCode == errorCode
-            )
-                return entry.getValue();
+//            contextMappings.entrySet().stream()
+//                .sorted((e1, e2)
+//                    -> Integer.compare(e2.getKey().length(), e1.getKey().length()))
+//                .forEach(ent -> {
+                    if (
+                        key.contains(entry.getKey()) &&
+                        entry.getValue().dbErrorCode == errorCode
+                    )
+                        return entry.getValue();
+//                };
         }
 
         return null;

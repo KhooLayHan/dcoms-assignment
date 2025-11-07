@@ -28,8 +28,8 @@ public final class DuplicateUserException extends HRMException {
     /**
      * Constructs a DuplicateUserException for a specific identifier.
      *
-     * @param identifier The type of identifier (e.g., "email", "username", "employee ID")
-     * @param identifierType The identifier value that already exists
+     * @param identifier The identifier value that already exists
+     * @param identifierType The type of identifier (e.g., "email", "username", "employee ID")
      */
     public DuplicateUserException(String identifier, String identifierType) {
         super(

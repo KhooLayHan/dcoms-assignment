@@ -22,17 +22,6 @@ public final class LeaveManagementException extends HRMException {
     private final LeaveViolationType violationType;
 
     /**
-     * Constructs a LeaveManagementException with the specified detail message.
-     *
-     * @param message The detail message explaining the leave error
-     */
-    public LeaveManagementException(String message) {
-        super(ErrorCode.LEAVE_INSUFFICIENT_BALANCE, message);
-        this.employeeId = null;
-        this.violationType = LeaveViolationType.UNKNOWN;
-    }
-
-    /**
      * Constructs a LeaveManagementException with specific error code.
      *
      * @param errorCode The specific leave management error code
@@ -113,8 +102,11 @@ public final class LeaveManagementException extends HRMException {
         String employeeId,
         String message
     ) {
+        String id = employeeId != null ? employeeId : "UNKNOWN";
+        String msg = message != null ? message : "No details provided";
+
         return String.format("Leave violation for employee %s: %s",
-            employeeId, message);
+            id, msg);
     }
 
     public String getEmployeeId() {

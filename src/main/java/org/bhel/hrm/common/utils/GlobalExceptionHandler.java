@@ -116,7 +116,7 @@ public class GlobalExceptionHandler {
         String errorId = context.getErrorId();
         String operation = context.getOperation();
 
-        logger.warn(
+        logger.error(
             "Unrecoverable error [errorId={}, operation={}, exceptionType={}]",
             errorId,
             operation,

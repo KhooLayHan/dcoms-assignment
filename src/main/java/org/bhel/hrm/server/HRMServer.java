@@ -1,6 +1,7 @@
 package org.bhel.hrm.server;
 
 import org.bhel.hrm.common.dtos.*;
+import org.bhel.hrm.common.error.ErrorCode;
 import org.bhel.hrm.common.exceptions.*;
 import org.bhel.hrm.common.services.HRMService;
 import org.bhel.hrm.server.daos.EmployeeDAO;
@@ -141,7 +142,11 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
         try {
             // 1. Find the employee by ID. The DAO returns an Optional.
             Employee employee = employeeDAO.findById(employeeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", employeeId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    ErrorCode.EMPLOYEE_NOT_FOUND,
+                    "Employee",
+                    employeeId
+                ));
 
             // 2. If found, map to a DTO and return.
             return EmployeeMapper.mapToDto(employee);
@@ -156,6 +161,22 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
         if (employeeDTO == null)
             throw new InvalidInputException("EmployeeDTO is null");
 
+        if (employeeDTO.id() <= 0) {
+            throw new InvalidInputException("id is required and must be > 0");
+        }
+
+        if (employeeDTO.firstName() == null || employeeDTO.firstName().trim().isEmpty()) {
+            throw new InvalidInputException("firstName is required");
+        }
+
+        if (employeeDTO.lastName() == null || employeeDTO.lastName().trim().isEmpty()) {
+            throw new InvalidInputException("lastName is required");
+        }
+
+        if (employeeDTO.icPassport() == null || employeeDTO.icPassport().trim().isEmpty()) {
+            throw new InvalidInputException("icPassport is required");
+        }
+
         logger.info("RMI Call: updateEmployeeProfile() for employee ID: {}", employeeDTO.id());
 
         try {
@@ -163,7 +184,11 @@ public class HRMServer extends UnicastRemoteObject implements HRMService {
 
             // 1. Find the existing employee in the database.
             Employee existingEmployee = employeeDAO.findById(employeeDTO.id())
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", employeeDTO.id()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    ErrorCode.EMPLOYEE_NOT_FOUND,
+                    "Employee",
+                    employeeDTO.id()
+                ));
 
             // 2. Update the fields of the existing domain object with the new data from the DTO.
             existingEmployee.setFirstName(employeeDTO.firstName());
