@@ -163,6 +163,8 @@ public final class DatabaseManager {
                 created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
+                CONSTRAINT uk_employees_first_last UNIQUE (first_name, last_name),
+
                 CONSTRAINT fk_employees_employee_id
                     FOREIGN KEY (user_id) REFERENCES users(id)
                     ON UPDATE CASCADE
