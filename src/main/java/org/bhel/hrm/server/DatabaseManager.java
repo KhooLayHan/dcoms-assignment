@@ -43,8 +43,12 @@ public final class DatabaseManager {
 
             transactionConnection.set(conn);
             logger.debug("Transaction started for Thread [{}]", Thread.currentThread().getName());
-        } finally {
-            closeTransactionConnection();
+        } catch (SQLException e) {
+            try {
+                conn.close();
+            } catch (SQLException suppressed) {
+                logger.warn("Error closing tx connection after begin failure.", suppressed);
+            }
         }
     }
 

@@ -1,5 +1,7 @@
 package org.bhel.hrm.common.exceptions;
 
+import org.bhel.hrm.common.error.ErrorCode;
+
 /**
  * A {@link DataAccessException} thrown when the SQL sent to the database
  * has incorrect syntax.
@@ -12,6 +14,10 @@ public final class IncorrectSqlGrammarException extends DataAccessException {
      * @param cause The underlying cause of the incorrect SQL grammar
      */
     public IncorrectSqlGrammarException(String message, Throwable cause) {
-        super(message, cause);
+        super(ErrorCode.DB_QUERY_ERROR, message, cause);
+    }
+
+    public IncorrectSqlGrammarException(ErrorCode errorCode, String message, Throwable cause) {
+        super(errorCode, message, cause);
     }
 }
