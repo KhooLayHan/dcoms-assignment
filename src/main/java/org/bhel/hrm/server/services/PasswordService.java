@@ -1,4 +1,4 @@
-package org.bhel.hrm.server;
+package org.bhel.hrm.server.services;
 
 import com.password4j.Password;
 
