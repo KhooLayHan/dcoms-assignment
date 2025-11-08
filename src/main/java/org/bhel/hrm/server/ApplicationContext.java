@@ -67,6 +67,8 @@ public class ApplicationContext {
     }
 
     /**
+     * Retrieves the current context's instance.
+     *
      * @return The single, global instance of the ApplicationContext.
      */
     public static ApplicationContext get() {

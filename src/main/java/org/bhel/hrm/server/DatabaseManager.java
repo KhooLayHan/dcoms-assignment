@@ -1,7 +1,6 @@
 package org.bhel.hrm.server;
 
 import org.bhel.hrm.common.exceptions.HRMException;
-import org.bhel.hrm.common.utils.GlobalExceptionHandler;
 import org.bhel.hrm.server.config.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,10 @@ public final class DatabaseManager {
 
     /**
      * Gets a connection. If a transaction is active on the current thread,
-     * it returns the transaction's connection. Otherwise, it creates a new one.
+     * returns the transaction's connection; otherwise, returns a new connection.
+     *
+     * @return A database connection; never null
+     * @throws SQLException If a database access error occurs
      */
     public Connection getConnection() throws SQLException {
         Connection conn = transactionConnection.get();
@@ -36,27 +38,26 @@ public final class DatabaseManager {
     }
 
     /**
-     * A functional interface representing a block of work that should be
+     * A functional interface representing code that should be
      * executed within a single database transaction.
      */
     @FunctionalInterface
     public interface TransactionalTask {
         /**
-         * The work to be performed. This code can throw exceptions, which will
-         * trigger a transaction rollback.
-         * @throws HRMException If any HRM error occurs during the operation.
+         * Executes the transactional work.
+         *
+         * @throws HRMException If a business rule or data validation error occurs
          */
         void execute() throws HRMException;
     }
 
     /**
      * Executes a given task within a managed database transaction.
-     * This template method handles the boilerplate of starting, committing,
-     * and rolling back the transaction.
+     * Handles connection lifecycle, commit, and rollback.
      *
-     * @param task The block of code to execute transactionally.
-     * @throws SQLException if there is an issue with managing the transaction itself.
-     * @throws HRMException if the task itself throws an HRM specific exception.
+     * @param task The block of code to execute transactionally; must not be null
+     * @throws SQLException If a database error occurs during transaction management
+     * @throws HRMException If the task throws an HRM specific exception.
      */
     public void executeInTransaction(TransactionalTask task) throws SQLException, HRMException {
         beginTransaction();
@@ -65,7 +66,6 @@ public final class DatabaseManager {
             commitTransaction();
         } catch (Exception e) {
             rollbackTransaction();
-
             switch (e) {
                 case HRMException hrmException -> throw hrmException;
                 case SQLException sqlException -> throw sqlException;
@@ -74,6 +74,11 @@ public final class DatabaseManager {
         }
     }
 
+    /**
+     * Starts a new transaction on the current thread.
+     *
+     * @throws SQLException If a transaction is already active or connection fails
+     */
     public void beginTransaction() throws SQLException {
         if (transactionConnection.get() != null)
             throw new SQLException("Transaction is already active on this thread.");
@@ -93,6 +98,11 @@ public final class DatabaseManager {
         }
     }
 
+    /**
+     * Commits the active transaction.
+     *
+     * @throws SQLException If a database error occurs during commit
+     */
     public void commitTransaction() throws SQLException {
         Connection conn = transactionConnection.get();
 
@@ -106,6 +116,9 @@ public final class DatabaseManager {
         }
     }
 
+    /**
+     * Rolls back the active transaction if one is in progress.
+     */
     public void rollbackTransaction() {
         Connection conn = transactionConnection.get();
 
@@ -121,6 +134,11 @@ public final class DatabaseManager {
         }
     }
 
+    /**
+     * Releases a non-transactional connection.
+     *
+     * @param conn The connection to release; may be null
+     */
     public void releaseConnection(Connection conn) {
         Connection tx = transactionConnection.get();
 
@@ -133,10 +151,18 @@ public final class DatabaseManager {
         }
     }
 
+    /**
+     * Checks if a transaction is active on the current thread.
+     *
+     * @return {@code true} if a transaction is active, false otherwise
+     */
     public boolean isTransactionActive() {
         return transactionConnection.get() != null;
     }
 
+    /**
+     * Closes the transactional connection and removes it from ThreadLocal.
+     */
     private void closeTransactionConnection() {
         Connection conn = transactionConnection.get();
 
@@ -151,6 +177,9 @@ public final class DatabaseManager {
         }
     }
 
+    /**
+     * Initializes the database schema.
+     */
     private void initializeDatabase() {
         try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
             createHRMTables(stmt);
@@ -161,6 +190,25 @@ public final class DatabaseManager {
         }
     }
 
+    /**
+     * Creates all HRM (Human Resource Management) database tables and populates lookup tables with initial data.
+     * <p>
+     * This method creates the following table groups in order:
+     * <ol>
+     *   <li>User authentication tables: {@code user_roles}, {@code users}</li>
+     *   <li>Employee information table: {@code employees}</li>
+     *   <li>Leave management tables: {@code leave_application_types}, {@code leave_application_statuses}, {@code leave_applications}</li>
+     *   <li>Training courses table: {@code training_courses}</li>
+     *   <li>Benefits management table: {@code benefit_plans}</li>
+     *   <li>Recruitment tables: {@code job_opening_statuses}, {@code job_openings}, {@code applicant_statuses}, {@code applicants}</li>
+     * </ol>
+     *
+     * All tables use the {@code IF NOT EXISTS} clause to allow safe re-execution.
+     * Lookup tables are populated with predefined values using {@code INSERT IGNORE} to prevent duplicate entries.
+     *
+     * @param stmt The SQL Statement object used to execute DDL commands
+     * @throws SQLException If a database access error occurs or table creation fails
+     */
     private void createHRMTables(Statement stmt) throws SQLException {
         // 1. Users and UserRoles table
         stmt.execute("""

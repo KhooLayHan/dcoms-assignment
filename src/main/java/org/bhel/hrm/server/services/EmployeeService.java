@@ -31,7 +31,8 @@ public class EmployeeService {
 
     /**
      * Retrieves a list of all employees.
-     * @return A list of EmployeeDTOs.
+     *
+     * @return A list of EmployeeDTOs; never null
      */
     public List<EmployeeDTO> getAllEmployees() {
         List<Employee> employees = employeeDAO.findAll();
@@ -42,9 +43,10 @@ public class EmployeeService {
 
     /**
      * Retrieves a single employee by their ID.
-     * @param employeeId The ID of the employee.
-     * @return The EmployeeDTO.
-     * @throws ResourceNotFoundException if no employee with that ID is found.
+     *
+     * @param employeeId The ID of the employee to fetch; must be positive
+     * @return The {@link EmployeeDTO} for the found employee; never null
+     * @throws ResourceNotFoundException If no employee with the given ID is found
      */
     public EmployeeDTO getEmployeeById(int employeeId) throws ResourceNotFoundException {
         Employee employee = employeeDAO.findById(employeeId)
@@ -61,10 +63,10 @@ public class EmployeeService {
 
     /**
      * Updates an employee's profile information within a transaction.
-     * @param employeeDTO The DTO containing the new data.
-     * @throws Exception for transactional failures.
-     * @throws ResourceNotFoundException if the employee ID is not found.
-     * @throws InvalidInputException if the input data is invalid.
+     *
+     * @param employeeDTO The DTO containing updated data; must not be null and must have a valid ID
+     * @throws HRMException If validation fails, employee not found, or business rule violation occurs
+     * @throws SQLException If a database transaction error occurs
      */
     public void updateEmployeeProfile(EmployeeDTO employeeDTO) throws SQLException, HRMException {
         validateEmployeeDTO(employeeDTO);
@@ -89,8 +91,10 @@ public class EmployeeService {
     }
 
     /**
-     * A private helper method for validating EmployeeDTO input.
-     * Throws InvalidInputException if validation fails.
+     * Validates the given EmployeeDTO.
+     *
+     * @param dto The EmployeeDTO to validate; must not be null
+     * @throws InvalidInputException If any required field is missing or invalid
      */
     private void validateEmployeeDTO(EmployeeDTO dto) throws InvalidInputException {
         if (dto == null) {

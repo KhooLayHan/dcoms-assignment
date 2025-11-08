@@ -59,9 +59,9 @@ public class UserService {
      * Registers a new employee in a single, atomic transaction.
      * This involves creating a User account and an associated Employee profile.
      *
-     * @param registrationData DTO containing all necessary data.
-     * @throws HRMException If the username already exists.
-     * @throws Exception For any other critical failure during the transaction.
+     * @param registrationData DTO containing all necessary data; must not be null
+     * @throws SQLException If a database access error occurs during the transaction
+     * @throws HRMException If the username already exists or another business rule is violated
      */
     public void registerNewEmployee(NewEmployeeRegistrationDTO registrationData) throws SQLException, HRMException {
         dbManager.executeInTransaction(() -> {
