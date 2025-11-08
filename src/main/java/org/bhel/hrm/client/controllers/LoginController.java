@@ -2,6 +2,7 @@ package org.bhel.hrm.client.controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.bhel.hrm.client.MainClient;
 import org.bhel.hrm.client.utils.DialogManager;
@@ -19,7 +20,7 @@ public class LoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     @FXML private TextField usernameField;
-    @FXML private TextField passwordField;
+    @FXML private PasswordField passwordField;
     @FXML private Label errorLabel;
 
     private HRMService hrmService;

@@ -21,7 +21,7 @@
     <TextField fx:id="usernameField" promptText="Enter your username" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
     <Label text="Password: " GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-    <TextField fx:id="passwordField" promptText="Enter your password" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+    <PasswordField fx:id="passwordField" promptText="Enter your password" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
     <Button onAction="#handleLoginButtonAction" text="Log In"
             GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.halignment="RIGHT"
