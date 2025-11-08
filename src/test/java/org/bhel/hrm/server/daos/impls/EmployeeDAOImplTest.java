@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("EmployeeDAO implementation tests")
-public class EmployeeDAOImplTest {
+class EmployeeDAOImplTest {
     @Container
     private static final MySQLContainer mysql = new MySQLContainer("mysql:8.4.0");
 
@@ -134,7 +134,7 @@ public class EmployeeDAOImplTest {
             // Given: An employee is saved
             User testUser = createAndSaveTestUser("delete_me");
             Employee employee = createAndSaveTestEmployee(testUser, "Delete", "Me", "D789");
-            assertThat(userDAO.findById(employee.getId())).isPresent(); // Verify it exists first
+            assertThat(employeeDAO.findById(employee.getId())).isPresent(); // Verify it exists first
 
             // When: We delete the employee by its ID
             employeeDAO.deleteById(employee.getId());
@@ -151,12 +151,12 @@ public class EmployeeDAOImplTest {
         @DisplayName("findAll() should return all employees sorted by last name, then first name")
         void findAll_shouldReturnAllEmployeesInOrder() {
             // Given: Multiple employees are saved in a specific order
-            User user_1 = createAndSaveTestUser("user_c");
-            User user_2 = createAndSaveTestUser("user_a");
-            User user_3 = createAndSaveTestUser("user_b");
-            createAndSaveTestEmployee(user_1, "Charlie", "Smith", "C1");
-            createAndSaveTestEmployee(user_2, "Alice", "Williams", "A2");
-            createAndSaveTestEmployee(user_3, "Bob", "Smith", "B3");
+            User user1 = createAndSaveTestUser("user_c");
+            User user2 = createAndSaveTestUser("user_a");
+            User user3 = createAndSaveTestUser("user_b");
+            createAndSaveTestEmployee(user1, "Charlie", "Smith", "C1");
+            createAndSaveTestEmployee(user2, "Alice", "Williams", "A2");
+            createAndSaveTestEmployee(user3, "Bob", "Smith", "B3");
 
             // When: We retrieve all employees
             List<Employee> employees = employeeDAO.findAll();
@@ -178,7 +178,7 @@ public class EmployeeDAOImplTest {
             User user1 = createAndSaveTestUser("employee1");
             User user2 = createAndSaveTestUser("employee2");
             createAndSaveTestEmployee(user1, "E1", "L1", "IC1");
-            createAndSaveTestEmployee(user1, "E2", "L2", "IC2");
+            createAndSaveTestEmployee(user2, "E2", "L2", "IC2");
 
             // When: We call count
             long employeeCount = employeeDAO.count();

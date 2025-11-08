@@ -84,7 +84,7 @@ public class UserService {
             employeeDAO.save(newEmployee);
 
             logger.info("Successfully registered the new Employee {} with user ID {}.",
-                newEmployee.getFirstName(), newEmployee.getId());
+                newEmployee.getFirstName(), newUser.getId());
         });
     }
 }
