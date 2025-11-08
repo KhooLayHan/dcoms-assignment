@@ -21,6 +21,8 @@ public class ApplicationContext {
 
     private final Configuration configuration;
     private final DatabaseManager databaseManager;
+    private DatabaseSeeder databaseSeeder;
+
     private final ErrorMessageProvider errorMessageProvider;
     private final ExceptionMappingConfig exceptionMappingConfig;
     private final GlobalExceptionHandler globalExceptionHandler;
@@ -48,6 +50,20 @@ public class ApplicationContext {
 
         this.userService = new UserService(databaseManager, userDAO, employeeDAO);
         this.employeeService = new EmployeeService(databaseManager, employeeDAO);
+
+        seedDatabase(configuration, databaseManager, userDAO, employeeDAO);
+    }
+
+    private void seedDatabase(
+        Configuration config,
+        DatabaseManager dbManager,
+        UserDAO userDAO,
+        EmployeeDAO employeeDAO
+    ) {
+        if ("development".equalsIgnoreCase(config.getAppEnvironment())) {
+            databaseSeeder = new DatabaseSeeder(dbManager, userDAO, employeeDAO);
+            databaseSeeder.seedIfEmpty();
+        }
     }
 
     /**
@@ -63,6 +79,10 @@ public class ApplicationContext {
 
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
+    }
+
+    public DatabaseSeeder getDatabaseSeeder() {
+        return databaseSeeder;
     }
 
     public ErrorMessageProvider getErrorMessageProvider() {
