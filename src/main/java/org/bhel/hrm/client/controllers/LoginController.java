@@ -1,13 +1,11 @@
 package org.bhel.hrm.client.controllers;
 
-import com.sun.tools.javac.Main;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import org.bhel.hrm.client.MainClient;
 import org.bhel.hrm.client.utils.DialogManager;
 import org.bhel.hrm.common.dtos.UserDTO;
-import org.bhel.hrm.common.exceptions.AuthenticationException;
 import org.bhel.hrm.common.exceptions.HRMException;
 import org.bhel.hrm.common.services.HRMService;
 import org.slf4j.Logger;
