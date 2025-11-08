@@ -2,8 +2,7 @@ package org.bhel.hrm.common.services;
 
 import org.bhel.hrm.common.dtos.*;
 import org.bhel.hrm.common.exceptions.AuthenticationException;
-import org.bhel.hrm.common.exceptions.DuplicateUserException;
-import org.bhel.hrm.common.exceptions.InvalidInputException;
+import org.bhel.hrm.common.exceptions.HRMException;
 import org.bhel.hrm.common.exceptions.ResourceNotFoundException;
 
 import java.rmi.Remote;
@@ -30,7 +29,7 @@ public interface HRMService extends Remote {
      * @throws AuthenticationException on authentication failure.
      * @throws RemoteException if a communication-related error occurs.
      */
-    UserDTO authenticateUser(String username, String password) throws RemoteException, AuthenticationException;
+    UserDTO authenticateUser(String username, String password) throws RemoteException, HRMException;
 
     // --- 2. Employee Management (Primarily for HR Staff) ---
 
@@ -40,7 +39,7 @@ public interface HRMService extends Remote {
      * @param registrationData A DTO containing all required details for the new user and employee.
      * @throws RemoteException if registration fails (e.g., username already exists) or a communication error occurs.
      */
-    void registerNewEmployee(NewEmployeeRegistrationDTO registrationData) throws RemoteException, DuplicateUserException;
+    void registerNewEmployee(NewEmployeeRegistrationDTO registrationData) throws RemoteException, HRMException;
 
     /**
      * Retrieves a list of all employees in the system.
@@ -48,7 +47,7 @@ public interface HRMService extends Remote {
      * @return A List of EmployeeDTOs.
      * @throws RemoteException if a communication-related error occurs.
      */
-    List<EmployeeDTO> getAllEmployees() throws RemoteException;
+    List<EmployeeDTO> getAllEmployees() throws RemoteException, HRMException;
 
     /**
      * Retrieves the full profile details for a single employee.
@@ -58,7 +57,7 @@ public interface HRMService extends Remote {
      * @throws RemoteException if the employee is not found or a communication error occurs.
      * @throws ResourceNotFoundException if the employee resource is not found.
      */
-    EmployeeDTO getEmployeeById(int employeeId) throws RemoteException, ResourceNotFoundException;
+    EmployeeDTO getEmployeeById(int employeeId) throws RemoteException, HRMException;
 
     /**
      * Updates the profile information for an existing employee.
@@ -66,7 +65,7 @@ public interface HRMService extends Remote {
      * @param employeeDTO The DTO containing the updated information. The ID must be valid.
      * @throws RemoteException if the update fails or a communication error occurs.
      */
-    void updateEmployeeProfile(EmployeeDTO employeeDTO) throws RemoteException, ResourceNotFoundException, InvalidInputException;
+    void updateEmployeeProfile(EmployeeDTO employeeDTO) throws RemoteException, HRMException;
 
     // --- 3. Leave Management (For Employees and HR) ---
 
