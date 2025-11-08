@@ -13,7 +13,7 @@ public class Configuration {
 
     private final Properties properties;
 
-    public Configuration() throws ConfigurationException {
+    public Configuration() {
         properties = new Properties();
 
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
