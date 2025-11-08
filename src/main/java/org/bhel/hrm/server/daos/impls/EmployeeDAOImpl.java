@@ -56,7 +56,7 @@ public class EmployeeDAOImpl extends AbstractDAO<Employee> implements EmployeeDA
             FROM
                 employees
             ORDER BY
-                first_name, last_name ASC
+                last_name, first_name ASC
         """;
 
         return findMany(sql, stmt -> {}, rowMapper);

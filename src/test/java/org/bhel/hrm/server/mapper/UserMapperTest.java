@@ -34,14 +34,8 @@ class UserMapperTest {
         @Test
         @DisplayName("should return null when the input domain object is null")
         void shouldReturnNullForNullDomain() {
-            // Given: A null domain object
-            User domain = null;
-
-            // When: The mapper attempts to maps it
-            UserDTO dto = UserMapper.mapToDto(domain);
-
-            // Then: The result should be null
-            assertThat(dto).isNull();
+            // Given, When, Then
+            assertThat(UserMapper.mapToDto(null)).isNull();
         }
     }
 
@@ -68,14 +62,8 @@ class UserMapperTest {
         @Test
         @DisplayName("should return null when the input DTO is null")
         void shouldReturnNullForNullDto() {
-            // Given: A null DTO
-            UserDTO dto = null;
-
-            // When: The mapper attempts to maps it
-            User domain = UserMapper.mapToDomain(dto);
-
-            // Then: The result should be null
-            assertThat(domain).isNull();
+            // Given, When, Then
+            assertThat(UserMapper.mapToDomain(null)).isNull();
         }
     }
 }

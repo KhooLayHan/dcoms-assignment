@@ -1,11 +1,6 @@
 package org.bhel.hrm.server;
 
 import org.bhel.hrm.common.services.HRMService;
-import org.bhel.hrm.server.config.Configuration;
-import org.bhel.hrm.server.daos.EmployeeDAO;
-import org.bhel.hrm.server.daos.UserDAO;
-import org.bhel.hrm.server.daos.impls.EmployeeDAOImpl;
-import org.bhel.hrm.server.daos.impls.UserDAOImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,12 +15,11 @@ public class ServerLauncher {
         try {
             logger.info("HRM Server is starting up...");
 
-            // 1. Load the configuration
-            Configuration configuration = new Configuration();
-            logger.info("Application is starting in [{}] environment.", configuration.getAppEnvironment());
+            // 1. Retrieves the current application context.
+            ApplicationContext applicationContext = ApplicationContext.get();
 
-            // 4. Setup and start the RMI server
-            HRMServer server = getHRMServer(configuration);
+            // 2. Setup and start the RMI server
+            HRMServer server = getHRMServer(applicationContext);
             Registry registry = LocateRegistry.createRegistry(1099);
             registry.rebind(HRMService.SERVICE_NAME, server);
 
@@ -36,19 +30,15 @@ public class ServerLauncher {
         }
     }
 
-    private static HRMServer getHRMServer(Configuration configuration) throws RemoteException {
-        DatabaseManager databaseManager = new DatabaseManager(configuration);
+    private static HRMServer getHRMServer(ApplicationContext context) throws RemoteException {
+        String env = context.getConfiguration().getAppEnvironment();
+        logger.info("Application is starting in [{}] environment.", env);
 
-        // 2. Setup database and DAOs
-        EmployeeDAO employeeDAO = new EmployeeDAOImpl(databaseManager);
-        UserDAO userDAO = new UserDAOImpl(databaseManager);
-
-        // 3. Conditionally seed the database
-        if ("development".equalsIgnoreCase(configuration.getAppEnvironment())) {
-            DatabaseSeeder seeder = new DatabaseSeeder(databaseManager, userDAO, employeeDAO);
-            seeder.seedIfEmpty();
-        }
-
-        return new HRMServer(databaseManager, employeeDAO, userDAO);
+        return new HRMServer(
+            context.getDatabaseManager(),
+            context.getEmployeeService(),
+            context.getUserService(),
+            context.getGlobalExceptionHandler()
+        );
     }
 }

@@ -6,6 +6,7 @@ import org.bhel.hrm.server.daos.EmployeeDAO;
 import org.bhel.hrm.server.daos.UserDAO;
 import org.bhel.hrm.server.domain.Employee;
 import org.bhel.hrm.server.domain.User;
+import org.bhel.hrm.server.services.PasswordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

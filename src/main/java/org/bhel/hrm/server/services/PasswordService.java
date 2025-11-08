@@ -1,4 +1,4 @@
-package org.bhel.hrm.server;
+package org.bhel.hrm.server.services;
 
 import com.password4j.Password;
 
@@ -31,7 +31,7 @@ public class PasswordService {
      *
      * @param plainTextPassword The password provided by the user during login.
      * @param storedHash The hash retrieved from the database.
-     * @return true if the password matches the hash, false otherwise.
+     * @return {@code true} if the password matches the hash, false otherwise.
      */
     public static boolean checkPassword(String plainTextPassword, String storedHash) {
         if (plainTextPassword == null || storedHash == null)
