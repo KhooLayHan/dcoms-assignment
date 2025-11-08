@@ -37,17 +37,8 @@ public class LoginController {
         this.mainClient = client;
     }
 
-    public LoginController() {
-        // Connects to the RMI service when the controller is created.
-        try {
-            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-            this.hrmService = (HRMService) registry.lookup(HRMService.SERVICE_NAME);
-        } catch (Exception e) {
-            logger.error("Client exception: Could not connect to the RMI service. ", e);
-        }
-    }
-
     private void connectToRMIService() {
+        // Connects to the RMI service when the controller is created.
         try {
             Registry registry = LocateRegistry.getRegistry("localhost", 1099);
             this.hrmService = (HRMService) registry.lookup(HRMService.SERVICE_NAME);
