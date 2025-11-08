@@ -7,11 +7,16 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.bhel.hrm.client.controllers.LoginController;
 import org.bhel.hrm.client.controllers.MainController;
+import org.bhel.hrm.client.utils.DialogManager;
 import org.bhel.hrm.common.dtos.UserDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class MainClient extends Application {
+    private static final Logger logger = LoggerFactory.getLogger(MainClient.class);
+
     private Stage primaryStage;
 
     @Override
@@ -31,13 +36,26 @@ public class MainClient extends Application {
 
             // Give the LoginController a reference back to this MainClient instance.
             LoginController controller = loader.getController();
+            if (controller == null)
+                throw new IllegalStateException("LoginController was not found in LoginView.fxml");
+
             controller.setMainApp(this);
 
             primaryStage.setTitle("BHEL Human Resource Management – Login");
             primaryStage.setScene(new Scene(root));
             primaryStage.show();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to load Login view", e);
+            DialogManager.showErrorDialog(
+                "Application LoginView Error",
+                "Could not load the Login screen. Please restart the application"
+            );
+        } catch (IllegalStateException e) {
+            logger.error("Controller initialization error", e);
+            DialogManager.showErrorDialog(
+                "Application LoginController Error",
+                "Login screen is not properly configured. Please contact support."
+            );
         }
     }
 
@@ -55,12 +73,25 @@ public class MainClient extends Application {
 
             // Gets the MainController and pass the authenticated user data to it.
             MainController controller = loader.getController();
+            if (controller == null)
+                throw new IllegalStateException("MainController was not found in MainView.fxml");
+
             controller.initData(user);
 
             primaryStage.setTitle("BHEL – Human Resource Management");
             primaryStage.setScene(new Scene(root));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to load Main view", e);
+            DialogManager.showErrorDialog(
+                "Application MainView Error",
+                "Could not load the Main screen. Please restart the application"
+            );
+        } catch (IllegalStateException e) {
+            logger.error("Controller initialization error", e);
+            DialogManager.showErrorDialog(
+                "Application MainController Error",
+                "Main screen is not properly configured. Please contact support."
+            );
         }
     }
 
