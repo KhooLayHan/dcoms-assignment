@@ -1,5 +1,7 @@
 package org.bhel.hrm.server;
 
+import org.bhel.hrm.common.exceptions.HRMException;
+import org.bhel.hrm.common.utils.GlobalExceptionHandler;
 import org.bhel.hrm.server.config.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,45 @@ public final class DatabaseManager {
 
         // Returns a new connection for a single, non-transactional operation
         return DriverManager.getConnection(config.getDbUrl(), config.getDbUser(), config.getDbPassword());
+    }
+
+    /**
+     * A functional interface representing a block of work that should be
+     * executed within a single database transaction.
+     */
+    @FunctionalInterface
+    public interface TransactionalTask {
+        /**
+         * The work to be performed. This code can throw exceptions, which will
+         * trigger a transaction rollback.
+         * @throws HRMException If any HRM error occurs during the operation.
+         */
+        void execute() throws HRMException;
+    }
+
+    /**
+     * Executes a given task within a managed database transaction.
+     * This template method handles the boilerplate of starting, committing,
+     * and rolling back the transaction.
+     *
+     * @param task The block of code to execute transactionally.
+     * @throws SQLException if there is an issue with managing the transaction itself.
+     * @throws HRMException if the task itself throws an HRM specific exception.
+     */
+    public void executeInTransaction(TransactionalTask task) throws SQLException, HRMException {
+        beginTransaction();
+        try {
+            task.execute();
+            commitTransaction();
+        } catch (Exception e) {
+            rollbackTransaction();
+
+            switch (e) {
+                case HRMException hrmException -> throw hrmException;
+                case SQLException sqlException -> throw sqlException;
+                default -> throw new HRMException("Unexpected error in transaction", e);
+            }
+        }
     }
 
     public void beginTransaction() throws SQLException {
