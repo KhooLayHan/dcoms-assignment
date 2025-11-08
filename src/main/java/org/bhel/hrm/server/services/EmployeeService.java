@@ -66,7 +66,7 @@ public class EmployeeService {
      * @throws ResourceNotFoundException if the employee ID is not found.
      * @throws InvalidInputException if the input data is invalid.
      */
-    public void updateEmployeeProfile(EmployeeDTO employeeDTO) throws SQLException, HRMException, InvalidInputException {
+    public void updateEmployeeProfile(EmployeeDTO employeeDTO) throws SQLException, HRMException {
         validateEmployeeDTO(employeeDTO);
 
         dbManager.executeInTransaction(() -> {
