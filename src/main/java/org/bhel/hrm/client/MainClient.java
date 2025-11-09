@@ -5,17 +5,117 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.bhel.hrm.client.controllers.LoginController;
+import org.bhel.hrm.client.controllers.MainController;
+import org.bhel.hrm.client.utils.DialogManager;
+import org.bhel.hrm.common.dtos.UserDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainClient extends Application {
+    private static final Logger logger = LoggerFactory.getLogger(MainClient.class);
+
+    private Stage primaryStage;
+    private ExecutorService executorService;
+
+    @Override
+    public void init() {
+        executorService = Executors.newCachedThreadPool(runnable -> {
+            Thread thread = new Thread(runnable);
+            thread.setDaemon(true); // Ensures all threads in the pool are daemon threads
+            return thread;
+        });
+    }
+
     @Override
     public void start(Stage primaryStage) throws IOException {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/org/bhel/hrm/client/view/MainView.fxml")));
-        primaryStage.setTitle("BHEL – Human Resource Management");
-        primaryStage.setScene(new Scene(root, 1280, 720));
-        primaryStage.show();
+        this.primaryStage = primaryStage;
+        showLoginView();
+    }
+
+    @Override
+    public void stop() {
+        if (executorService != null) {
+            executorService.shutdownNow();
+        }
+    }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    /**
+     * Loads and displays the LoginView.
+     */
+    public void showLoginView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/org/bhel/hrm/client/view/LoginView.fxml"));
+            Parent root = loader.load();
+
+            // Give the LoginController a reference back to this MainClient instance.
+            LoginController controller = loader.getController();
+            if (controller == null)
+                throw new IllegalStateException("LoginController was not found in LoginView.fxml");
+
+            controller.setMainApp(this);
+
+            primaryStage.setTitle("BHEL Human Resource Management – Login");
+            primaryStage.setScene(new Scene(root));
+            primaryStage.show();
+        } catch (IOException e) {
+            logger.error("Failed to load Login view", e);
+            DialogManager.showErrorDialog(
+                "Application LoginView Error",
+                "Could not load the Login screen. Please restart the application"
+            );
+        } catch (IllegalStateException e) {
+            logger.error("Controller initialization error", e);
+            DialogManager.showErrorDialog(
+                "Application LoginController Error",
+                "Login screen is not properly configured. Please contact support."
+            );
+        }
+    }
+
+    /**
+     * Called by the LoginController upon successful authentication.
+     * Switches the scene to the main application view.
+     *
+     * @param user The authenticated UserDTO
+     */
+    public void showMainView(UserDTO user) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/org/bhel/hrm/client/view/MainView.fxml"));
+            Parent root = loader.load();
+
+            // Gets the MainController and pass the authenticated user data to it.
+            MainController controller = loader.getController();
+            if (controller == null)
+                throw new IllegalStateException("MainController was not found in MainView.fxml");
+
+            controller.initData(user);
+
+            primaryStage.setTitle("BHEL – Human Resource Management");
+            primaryStage.setScene(new Scene(root));
+        } catch (IOException e) {
+            logger.error("Failed to load Main view", e);
+            DialogManager.showErrorDialog(
+                "Application MainView Error",
+                "Could not load the Main screen. Please restart the application"
+            );
+        } catch (IllegalStateException e) {
+            logger.error("Controller initialization error", e);
+            DialogManager.showErrorDialog(
+                "Application MainController Error",
+                "Main screen is not properly configured. Please contact support."
+            );
+        }
     }
 
     public static void main(String[] args) {

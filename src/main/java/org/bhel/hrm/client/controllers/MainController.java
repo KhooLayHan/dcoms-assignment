@@ -1,7 +1,6 @@
 package org.bhel.hrm.client.controllers;
 
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
@@ -11,26 +10,27 @@ import org.bhel.hrm.common.dtos.UserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 /**
  * The main controller for the application's primary view (MainView.fxml).
  * It manages the main layout, navigation, and content swapping.
  */
-public class MainController implements Initializable {
+public class MainController {
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
     @FXML private VBox navigationVBox;
     @FXML private StackPane contentArea;
     @FXML private Label loggedInUserLabel;
 
-    // Set up after a successful login screen.
     private UserDTO currentUser;
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        this.currentUser = new UserDTO(1, "hr_admin", UserDTO.Role.HR_STAFF);
+    /**
+     * This method is called by the MainClient after the FXML is loaded
+     * to pass in the authenticated user.
+     *
+     * @param user The authenticated user from the login screen
+     */
+    public void initData(UserDTO user) {
+        this.currentUser = user;
 
         loggedInUserLabel.setText(currentUser.username());
         buildNavigationMenu();
