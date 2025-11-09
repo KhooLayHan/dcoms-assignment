@@ -85,6 +85,9 @@ public class LoginController {
         };
 
         loginTask.setOnSucceeded(event -> {
+            usernameField.setDisable(false);
+            passwordField.setDisable(false);
+
             UserDTO authenticatedUser = loginTask.getValue();
             if (authenticatedUser != null) {
                 logger.info("Login successful for user: {}", username);
