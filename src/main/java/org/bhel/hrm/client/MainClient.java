@@ -13,16 +13,39 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainClient extends Application {
     private static final Logger logger = LoggerFactory.getLogger(MainClient.class);
 
     private Stage primaryStage;
+    private ExecutorService executorService;
+
+    @Override
+    public void init() {
+        executorService = Executors.newCachedThreadPool(runnable -> {
+            Thread thread = new Thread(runnable);
+            thread.setDaemon(true); // Ensures all threads in the pool are daemon threads
+            return thread;
+        });
+    }
 
     @Override
     public void start(Stage primaryStage) throws IOException {
         this.primaryStage = primaryStage;
         showLoginView();
+    }
+
+    @Override
+    public void stop() {
+        if (executorService != null) {
+            executorService.shutdownNow();
+        }
+    }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
     }
 
     /**

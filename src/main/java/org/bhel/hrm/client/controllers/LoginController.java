@@ -125,10 +125,6 @@ public class LoginController {
             }
         });
 
-        Thread loginThread = new Thread(loginTask, "login-task");
-        loginThread.setDaemon(true);
-        loginThread.start();
-
-//        new Thread(loginTask).start();
+        mainClient.getExecutorService().submit(loginTask);
     }
 }
