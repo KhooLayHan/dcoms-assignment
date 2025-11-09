@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.bhel.hrm.client.utils.DialogManager;
 import org.bhel.hrm.common.dtos.EmployeeDTO;
 import org.bhel.hrm.common.dtos.NewEmployeeRegistrationDTO;
 import org.bhel.hrm.common.dtos.UserDTO;
@@ -59,6 +60,22 @@ public class EmployeeFormController {
 
     public boolean isSaved() {
         return isSaved;
+    }
+
+    @FXML
+    public void handleSave() {
+        try {
+            if (employeeToEdit == null)
+                saveNewEmployee();
+            else
+                updateExistingEmployee();
+        } catch (HRMException e) {
+            DialogManager.showErrorDialog(
+                "Validation Error", e.getErrorCode());
+        } catch (RemoteException e) {
+            DialogManager.showErrorDialog(
+                "Server Error", "An error occurred while saving the employee.");
+        }
     }
 
     private void saveNewEmployee() throws RemoteException, HRMException {
