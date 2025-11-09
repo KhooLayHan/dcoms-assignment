@@ -73,6 +73,10 @@ public class LoginController {
             return;
         }
 
+        errorLabel.setText("Authenticating...");
+        usernameField.setDisable(true);
+        passwordField.setDisable(true);
+
         Task<UserDTO> loginTask = new Task<UserDTO>() {
             @Override
             protected UserDTO call() throws Exception {
@@ -93,6 +97,9 @@ public class LoginController {
         });
 
         loginTask.setOnFailed(event -> {
+            usernameField.setDisable(false);
+            passwordField.setDisable(false);
+
             Throwable error = loginTask.getException();
 
             switch (error) {
@@ -118,6 +125,10 @@ public class LoginController {
             }
         });
 
-        new Thread(loginTask).start();
+        Thread loginThread = new Thread(loginTask, "login-task");
+        loginThread.setDaemon(true);
+        loginThread.start();
+
+//        new Thread(loginTask).start();
     }
 }
