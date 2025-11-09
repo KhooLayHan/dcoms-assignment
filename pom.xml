@@ -35,6 +35,15 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <!-- ikonli: https://github.com/kordamp/ikonli -->
+            <dependency>
+                <groupId>org.kordamp.ikonli</groupId>
+                <artifactId>ikonli-bom</artifactId>
+                <version>12.4.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -127,6 +136,23 @@
             <groupId>com.password4j</groupId>
             <artifactId>password4j</artifactId>
             <version>1.8.4</version>
+        </dependency>
+
+        <!-- ControlsFX: https://github.com/controlsfx/controlsfx -->
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>11.2.2</version>
+        </dependency>
+
+        <!-- ikonli: https://github.com/kordamp/ikonli -->
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-javafx</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-materialdesign2-pack</artifactId>
         </dependency>
     </dependencies>
 
