@@ -1,5 +1,6 @@
 package org.bhel.hrm.client.controllers;
 
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -72,26 +73,51 @@ public class LoginController {
             return;
         }
 
-        try {
-            // Calls the remote authentication method
-            UserDTO authenticatedUser = hrmService.authenticateUser(username, password);
+        Task<UserDTO> loginTask = new Task<UserDTO>() {
+            @Override
+            protected UserDTO call() throws Exception {
+                return hrmService.authenticateUser(username, password);
+            }
+        };
 
+        loginTask.setOnSucceeded(event -> {
+            UserDTO authenticatedUser = loginTask.getValue();
             if (authenticatedUser != null) {
                 logger.info("Login successful for user: {}", username);
 
                 // On success, tell the main application to switch to the main view
                 mainClient.showMainView(authenticatedUser);
             } else {
-                // This case should not be hit if the server throws exceptions correctly, but is a good fallback.
                 errorLabel.setText("Invalid username or password.");
             }
-        } catch (HRMException e) {
-            logger.warn("Authentication failed for user '{}': {}", username, e.getMessage());
-            errorLabel.setText("Invalid username or password.");
-        } catch (RemoteException e) {
-            logger.error("RMI error during authentication.", e);
-            DialogManager.showErrorDialog(
-                "Server Error", "An error occurred while communicating with the server. Please try again.");
-        }
+        });
+
+        loginTask.setOnFailed(event -> {
+            Throwable error = loginTask.getException();
+
+            switch (error) {
+                case HRMException hrmException -> {
+                    logger.warn("Authentication failed for user '{}': {}",
+                        username, hrmException.getMessage());
+                    errorLabel.setText("Invalid username or password.");
+                }
+                case RemoteException remoteException -> {
+                    logger.error("RMI error during authentication.", remoteException);
+                    DialogManager.showErrorDialog(
+                        "Server Error",
+                        "An error occurred while communicating with the server. Please try again."
+                    );
+                }
+                default -> {
+                    logger.error("Unexpected error during login.", error);
+                    DialogManager.showErrorDialog(
+                        "Login Error",
+                        "Unexpected error during login. Please try again."
+                    );
+                }
+            }
+        });
+
+        new Thread(loginTask).start();
     }
 }
