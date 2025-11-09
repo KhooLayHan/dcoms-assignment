@@ -47,7 +47,7 @@ public class MainController {
         // Role-based navigation
         if (currentUser.role() == UserDTO.Role.HR_STAFF) {
             addNavigationBtn("Employees",
-                () -> ViewManager.loadView(contentArea, "/org/bhel/hrm/client/view/HRDashboardView.fxml"));
+                () -> ViewManager.loadView(contentArea, "/org/bhel/hrm/client/view/EmployeeManagementView.fxml"));
 
             addNavigationBtn("Recruitment", () -> logger.info("Loading recruitment view..."));
             addNavigationBtn("Training Admin", () -> logger.info("Loading training admin view..."));
@@ -72,7 +72,7 @@ public class MainController {
     private void loadDashboardView() {
         // Uses the ViewManager to load the appropriate dashboard
         if (currentUser.role() == UserDTO.Role.HR_STAFF) {
-            ViewManager.loadView(contentArea, "/org/bhel/hrm/client/view/HRDashboardView.fxml");
+            ViewManager.loadView(contentArea, "/org/bhel/hrm/client/view/EmployeeManagementView.fxml");
         } else {
             // Placeholder to load other employee-specific Dashboard views. For instance:
             // ViewManager.loadView(contentArea, "/org/bhel/hrm/client/view/EmployeeDashboardView.fxml");
