@@ -1,11 +1,11 @@
 package org.bhel.hrm.client.controllers;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import org.bhel.hrm.client.MainClient;
+import org.bhel.hrm.client.services.ServiceManager;
 import org.bhel.hrm.client.utils.DialogManager;
 import org.bhel.hrm.common.dtos.UserDTO;
 import org.bhel.hrm.common.exceptions.HRMException;
@@ -16,42 +16,54 @@ import org.slf4j.LoggerFactory;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.concurrent.ExecutorService;
 
 public class LoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+    private static final int MAX_LOGIN_ATTEMPTS = 5;
+    private static final long LOCKOUT_DURATION_MS = 300_000; // Equivalent to 5 minutes
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
+    @FXML private ProgressIndicator loadingIndicator;
     @FXML private Label errorLabel;
+    @FXML private CheckBox rememberMeCheckbox;
 
+    private ServiceManager serviceManager;
+    private ExecutorService executorService;
+    private MainClient mainClient;
     private HRMService hrmService;
-    private MainClient mainClient; // References the main application class
+
+    private int loginAttempts = 0;
+    private long lockoutEndTime = 0;
 
     @FXML
     public void initialize() {
         // Clears any previous error messages
         errorLabel.setText("");
-        connectToRMIService();
+        errorLabel.setVisible(false);
+        loadingIndicator.setVisible(false);
+
+        // Sets initial focus to username field
+        Platform.runLater(() -> usernameField.requestFocus());
     }
 
     public void setMainApp(MainClient client) {
         this.mainClient = client;
     }
 
-    private void connectToRMIService() {
-        // Connects to the RMI service when the controller is created.
-        try {
-            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-            this.hrmService = (HRMService) registry.lookup(HRMService.SERVICE_NAME);
+    public void setServiceManager(ServiceManager serviceManager) {
+        this.serviceManager = serviceManager;
 
-            logger.info("Successfully connected to the RMI service.");
-        } catch (Exception e) {
-            logger.error("Client Error: Could not connect to the RMI service.", e);
-            DialogManager.showErrorDialog(
-                "Connection Error",
-                "Could not connect to the server. Please ensure the server is running."
-            );
+        if (!serviceManager.isConnected()) {
+            errorLabel.setText("Cannot connect to the server. Please check your connection.");
+            usernameField.setDisable(true);
+            passwordField.setDisable(true);
         }
+    }
+
+    public void setExecutorService(ExecutorService executorService) {
+        this.executorService = executorService;
     }
 
     @FXML
@@ -65,7 +77,7 @@ public class LoginController {
             return;
         }
 
-        String username = usernameField.getText();
+        String username = usernameField.getText().trim();
         String password = passwordField.getText();
 
         if (username.isBlank() || password.isBlank()) {
@@ -73,7 +85,9 @@ public class LoginController {
             return;
         }
 
-        errorLabel.setText("Authenticating...");
+        // Shows loading state
+        errorLabel.setVisible(true);
+        loadingIndicator.setVisible(true);
         usernameField.setDisable(true);
         passwordField.setDisable(true);
 
@@ -85,23 +99,26 @@ public class LoginController {
         };
 
         loginTask.setOnSucceeded(event -> {
+            loadingIndicator.setVisible(false);
             usernameField.setDisable(false);
             passwordField.setDisable(false);
 
             UserDTO authenticatedUser = loginTask.getValue();
             if (authenticatedUser != null) {
                 logger.info("Login successful for user: {}", username);
-
-                // On success, tell the main application to switch to the main view
+                loginAttempts = 0; // Resets attempts on success
                 mainClient.showMainView(authenticatedUser);
             } else {
-                errorLabel.setText("Invalid username or password.");
+                passwordField.clear();
+                handleFailedLogin("Invalid username or password.");
             }
         });
 
         loginTask.setOnFailed(event -> {
+            loadingIndicator.setVisible(false);
             usernameField.setDisable(false);
             passwordField.setDisable(false);
+            passwordField.clear(); // Clears password for security
 
             Throwable error = loginTask.getException();
 
@@ -109,7 +126,7 @@ public class LoginController {
                 case HRMException hrmException -> {
                     logger.warn("Authentication failed for user '{}': {}",
                         username, hrmException.getMessage());
-                    errorLabel.setText("Invalid username or password.");
+                    handleFailedLogin("Invalid username or password.");
                 }
                 case RemoteException remoteException -> {
                     logger.error("RMI error during authentication.", remoteException);
@@ -128,6 +145,24 @@ public class LoginController {
             }
         });
 
-        mainClient.getExecutorService().submit(loginTask);
+        executorService.submit(loginTask);
+    }
+
+    private void handleFailedLogin(String message) {
+        // TODO: Add user retry and login attempts logic
+        showError(message);
+    }
+
+    private void showError(String message) {
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+    }
+
+    @FXML
+    private void handleForgotPassword() {
+        DialogManager.showInfoDialog(
+            "Forgot Password",
+            "Please contact your system administrator to reset your password."
+        );
     }
 }
