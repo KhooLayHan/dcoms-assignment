@@ -17,18 +17,31 @@
         <ColumnConstraints hgrow="SOMETIMES" minWidth="200.0"/>
     </columnConstraints>
 
+    <Label text="BHEL Human Resource Management"
+           GridPane.rowIndex="0" GridPane.columnSpan="2" GridPane.halignment="CENTER"
+           styleClass="login-title">
+        <GridPane.margin>
+            <Insets bottom="20"/>
+        </GridPane.margin>
+
+    </Label>
+
     <Label text="Username: " GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-    <TextField fx:id="usernameField" promptText="Enter your username" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    <TextField fx:id="usernameField" promptText="Enter your username"
+               GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
     <Label text="Password: " GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-    <PasswordField fx:id="passwordField" promptText="Enter your password" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+    <PasswordField fx:id="passwordField" promptText="Enter your password"
+                   GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
     <Button onAction="#handleLoginButtonAction" text="Log In"
-            GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.halignment="RIGHT"
+            GridPane.rowIndex="3" GridPane.columnIndex="1"
+            maxWidth="Infinity"
             defaultButton="true" styleClass="button-primary"/>
 
     <!-- This label will display error messages -->
-    <Label fx:id="errorLabel" textFill="red" GridPane.rowIndex="4" GridPane.columnSpan="2" GridPane.halignment="CENTER">
+    <Label fx:id="errorLabel" textFill="red"
+           GridPane.rowIndex="4" GridPane.columnSpan="2" GridPane.halignment="CENTER">
         <GridPane.margin>
             <Insets top="10"/>
         </GridPane.margin>
