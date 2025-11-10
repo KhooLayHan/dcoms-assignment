@@ -3,12 +3,19 @@ package org.bhel.hrm.client.controllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.bhel.hrm.client.MainClient;
+import org.bhel.hrm.client.constants.FXMLPaths;
+import org.bhel.hrm.client.services.ServiceManager;
+import org.bhel.hrm.client.utils.DialogManager;
 import org.bhel.hrm.client.utils.ViewManager;
 import org.bhel.hrm.common.dtos.UserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ExecutorService;
 
 /**
  * The main controller for the application's primary view (MainView.fxml).
@@ -20,8 +27,13 @@ public class MainController {
     @FXML private VBox navigationVBox;
     @FXML private StackPane contentArea;
     @FXML private Label loggedInUserLabel;
+    @FXML private BorderPane mainPane;
 
     private UserDTO currentUser;
+    private ServiceManager serviceManager;
+    private ExecutorService executorService;
+    private Button activeButton = null;
+    private MainClient mainClient;
 
     /**
      * This method is called by the MainClient after the FXML is loaded
@@ -30,12 +42,24 @@ public class MainController {
      * @param user The authenticated user from the login screen
      */
     public void initData(UserDTO user) {
+        if (user == null || user.role() == null) {
+            logger.error("Invalid user data received.");
+            DialogManager.showErrorDialog(
+                "Authentication Error",
+                "Invalid user session. Please login again."
+            );
+
+            return;
+        }
+
         this.currentUser = user;
-
         loggedInUserLabel.setText(currentUser.username());
-        buildNavigationMenu();
+        refreshNavigation();
+    }
 
-        loadDashboardView(); // Loads the initial dashboard view
+    public void refreshNavigation() {
+        buildNavigationMenu();
+        loadDashboardView();
     }
 
     private void buildNavigationMenu() {
@@ -64,15 +88,23 @@ public class MainController {
     private void addNavigationBtn(String text, Runnable action) {
         Button button = new Button(text);
         button.setMaxWidth(Double.MAX_VALUE);
-        button.getStyleClass().add("nav-button"); // Adds a CSS class for styling
-        button.setOnAction(e -> action.run());
+        button.getStyleClass().add("nav-button");
+        button.setOnAction(e -> {
+            if (activeButton != null)
+                activeButton.getStyleClass().remove("nav-button-active");
+
+            button.getStyleClass().add("nav-button-active");
+            activeButton = button;
+
+            action.run();
+        });
         navigationVBox.getChildren().add(button);
     }
 
     private void loadDashboardView() {
         // Uses the ViewManager to load the appropriate dashboard
         if (currentUser.role() == UserDTO.Role.HR_STAFF) {
-            ViewManager.loadView(contentArea, "/org/bhel/hrm/client/view/EmployeeManagementView.fxml");
+            ViewManager.loadView(contentArea, FXMLPaths.EMPLOYEE_MANAGEMENT);
         } else {
             // Placeholder to load other employee-specific Dashboard views. For instance:
             // ViewManager.loadView(contentArea, "/org/bhel/hrm/client/view/EmployeeDashboardView.fxml");
@@ -81,7 +113,32 @@ public class MainController {
 
     @FXML
     private void handleLogout() {
-        logger.info("User logged out.");
-        // TODO: Add logic to close this window and show the login screen.
+        logger.info("User {} logged out.", currentUser.username());
+
+        // Optional: Confirm logout
+        if (!DialogManager.showConfirmationDialog(
+            "Logout",
+            "Are you sure you want to logout?"
+        ))
+            return;
+
+        this.currentUser = null;
+        mainClient.showLoginView();
+    }
+
+    public ServiceManager getServiceManager() {
+        return serviceManager;
+    }
+
+    public void setServiceManager(ServiceManager serviceManager) {
+        this.serviceManager = serviceManager;
+    }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    public void setExecutorService(ExecutorService executorService) {
+        this.executorService = executorService;
     }
 }
