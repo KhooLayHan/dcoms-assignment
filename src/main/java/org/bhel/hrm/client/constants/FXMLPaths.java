@@ -5,7 +5,7 @@ public class FXMLPaths {
         throw new UnsupportedOperationException("FXMLPaths is a utility class and should not be instantiated.");
     }
 
-    public static final String BASE = "org/bhel/hrm/client/view/";
+    public static final String BASE = "/org/bhel/hrm/client/view/";
 
     private static final String EXTENSION = ".fxml";
 

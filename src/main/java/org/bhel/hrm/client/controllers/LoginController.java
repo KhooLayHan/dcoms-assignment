@@ -52,6 +52,7 @@ public class LoginController {
 
     public void setServiceManager(ServiceManager serviceManager) {
         this.serviceManager = serviceManager;
+        this.hrmService = serviceManager.getHrmService();
 
         if (!serviceManager.isConnected()) {
             errorLabel.setText("Cannot connect to the server. Please check your connection.");
