@@ -16,7 +16,7 @@ public final class DialogManager {
     private static final ErrorMessageProvider messageProvider = new ErrorMessageProvider();
 
     private DialogManager() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated.");
+        throw new UnsupportedOperationException("DialogManager is a utility class and should not be instantiated.");
     }
 
     // --- Information and Success Dialogs ---
