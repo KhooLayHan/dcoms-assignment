@@ -29,13 +29,16 @@
 
         <!-- Employee Profile Details -->
         <Label text="First Name: " GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-        <TextField fx:id="firstNameField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+        <TextField fx:id="firstNameField" promptText="Enter First Name"
+                   GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
         <Label text="Last Name: " GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-        <TextField fx:id="lastNameField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+        <TextField fx:id="lastNameField" promptText="Enter Last Name"
+                   GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
         <Label text="IC/Passport: " GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-        <TextField fx:id="icPassportField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+        <TextField fx:id="icPassportField" promptText="123456-78-9012"
+                   GridPane.rowIndex="6" GridPane.columnIndex="1"/>
     </GridPane>
 
     <HBox alignment="CENTER_RIGHT" spacing="10">
