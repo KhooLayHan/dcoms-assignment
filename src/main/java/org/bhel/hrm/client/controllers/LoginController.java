@@ -81,6 +81,7 @@ public class LoginController {
 
         if (username.isBlank() || password.isBlank()) {
             errorLabel.setText("Username and password cannot be empty.");
+            errorLabel.setVisible(true);
             return;
         }
 

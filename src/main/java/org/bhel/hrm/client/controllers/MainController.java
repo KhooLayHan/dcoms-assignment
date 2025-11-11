@@ -123,6 +123,7 @@ public class MainController {
     }
 
     public void refreshNavigation() {
+        activeButton = null;
         buildNavigationMenu();
         loadDashboardView();
     }

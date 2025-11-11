@@ -122,6 +122,7 @@ public class MainClient extends Application {
             if (controller == null)
                 throw new IllegalStateException("MainController was not found in MainView.fxml");
 
+            controller.setMainClient(this);
             controller.setServiceManager(serviceManager);
             controller.setExecutorService(executorService);
             controller.initData(user);

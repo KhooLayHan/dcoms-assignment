@@ -121,7 +121,7 @@ public class ViewManager {
         StackPane errorPane = new StackPane();
         Label errorLabel = new Label("Failed to load view: " + fxmlPath);
 
-        errorLabel.setStyle("error-pane");
+        errorLabel.getStyleClass().add("error-pane");
         errorLabel.setWrapText(true);
         errorLabel.setMaxWidth(400);
 
