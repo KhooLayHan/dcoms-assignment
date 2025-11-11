@@ -11,6 +11,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.bhel.hrm.client.MainClient;
@@ -22,6 +25,7 @@ import org.bhel.hrm.common.services.HRMService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 import java.rmi.registry.LocateRegistry;
@@ -36,6 +40,8 @@ import java.util.concurrent.ExecutorService;
  */
 public class EmployeeManagementController implements Initializable {
     private static final Logger logger = LoggerFactory.getLogger(EmployeeManagementController.class);
+    private static final String EMPLOYEE_TABLE_PLACEHOLDER_MESSAGE =
+        "No employees found. Click 'Add New Employee' to get started.";
 
     @FXML private TableView<EmployeeDTO> employeeTable;
     @FXML private TableColumn<EmployeeDTO, Integer> idColumn;
@@ -63,6 +69,7 @@ public class EmployeeManagementController implements Initializable {
 
         // Get dependencies from parent controller
         MainController mainController = getMainController();
+
         if (mainController != null) {
             this.serviceManager = mainController.getServiceManager();
             this.executorService = mainController.getExecutorService();
@@ -110,19 +117,6 @@ public class EmployeeManagementController implements Initializable {
         return null;
     }
 
-    private void connectToRmiService() {
-        try {
-            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-            this.hrmService = (HRMService) registry.lookup(HRMService.SERVICE_NAME);
-        } catch (Exception e) {
-            logger.error("Client Error: Could not connect to the RMI service.", e);
-            DialogManager.showErrorDialog(
-                "Connection Error",
-                "Could not connect to the server. Please ensure the server is running."
-            );
-        }
-    }
-
     /**
      * Initializes the table columns with cell value factories.
      */
@@ -162,9 +156,7 @@ public class EmployeeManagementController implements Initializable {
             observable,
             oldValue,
             newValue
-            ) -> {
-            filterEmployees(newValue);
-        });
+            ) -> filterEmployees(newValue));
     }
 
     /**
@@ -173,20 +165,17 @@ public class EmployeeManagementController implements Initializable {
     private void loadEmployees() {
         if (hrmService == null) {
             logger.warn("Cannot load employees - HRMService is null");
-
-            DialogManager.showErrorDialog(
-                "Client Error",
-                "Could not connect to the server."
-            );
             return;
         }
 
         // Show loading indicator
         employeeTable.setPlaceholder(new Label("Loading employee..."));
+        employeeTable.setDisable(true);
 
         Task<List<EmployeeDTO>> employeeManagementTask = new Task<>() {
             @Override
             protected List<EmployeeDTO> call() throws Exception {
+                logger.debug("Fetching all employees from server...");
                 return hrmService.getAllEmployees();
             }
         };
@@ -194,12 +183,26 @@ public class EmployeeManagementController implements Initializable {
         employeeManagementTask.setOnSucceeded(event -> {
             logger.info("Successfully fetched employee data.");
 
-            employeeTable.setItems(
-                FXCollections.observableArrayList(employeeManagementTask.getValue()));
+            List<EmployeeDTO> employees = employeeManagementTask.getValue();
+            allEmployees = FXCollections.observableArrayList(employees);
+            filteredEmployees = FXCollections.observableArrayList(employees);
+
+            employeeTable.setItems(filteredEmployees);
+            employeeTable.setDisable(false);
+
+            logger.info("Loaded {} employees", employees.size());
+
+            // Restore default placeholder
+            employeeTable.setPlaceholder(
+                new Label(EMPLOYEE_TABLE_PLACEHOLDER_MESSAGE)
+            );
         });
 
         employeeManagementTask.setOnFailed(event -> {
-            logger.error("Failed to fetch employees", employeeManagementTask.getException());
+            employeeTable.setDisable(false);
+            logger.error("Failed to fetch employee data", employeeManagementTask.getException());
+
+            employeeTable.setPlaceholder(new Label("Failed to load employees. Click 'Refresh' to try again."));
 
             DialogManager.showErrorDialog(
                 "Load Error",
@@ -207,19 +210,83 @@ public class EmployeeManagementController implements Initializable {
             );
         });
 
-         mainClient.getExecutorService().submit(employeeManagementTask);
-
+        executorService.submit(employeeManagementTask);
     }
 
+    /**
+     * Filters the employee list based on search criteria.
+     */
+    private void filterEmployees(String searchText) {
+        if (allEmployees == null)
+            return;
+
+        if (searchText == null || searchText.trim().isEmpty()) {
+            filteredEmployees.setAll(allEmployees);
+            return;
+        }
+
+        String lowerSearch = searchText.toLowerCase().trim();
+        List<EmployeeDTO> filtered = allEmployees.stream()
+            .filter(emp ->
+                emp.firstName().toLowerCase().contains(lowerSearch) ||
+                emp.lastName().toLowerCase().contains(lowerSearch) ||
+                emp.icPassport().toLowerCase().contains(lowerSearch) ||
+                String.valueOf(emp.id()).contains(lowerSearch)
+            ).toList();
+
+        filteredEmployees.setAll(filtered);
+    }
+
+    /**
+     * Handles the search button action.
+     */
+    @FXML
+    private void handleSearch() {
+        String searchText = searchField.getText();
+        filterEmployees(searchText);
+
+        logger.debug("Search performed with text: {}", searchText);
+    }
+
+    /**
+     * Handles the clear search button action.
+     */
+    @FXML
+    private void handleClearSearch() {
+        searchField.clear();
+        filterEmployees("");
+
+        logger.debug("Search is cleared...");
+    }
+
+    /**
+     * Handles the refresh button action.
+     */
+    @FXML
+    private void handleRefresh() {
+        logger.info("Refreshing employee list...");
+
+        searchField.clear();
+        loadEmployees();
+    }
+
+    /**
+     * Handles the add new employee button action.
+     */
     @FXML
     private void handleAddNewEmployee() {
+        logger.info("Opening add employee dialog...");
         showEmployeeFormDialog(null);
     }
 
+    /**
+     * Handles the edit selected employee button action.
+     */
     @FXML
     private void handleEditSelectedEmployee() {
         EmployeeDTO selectedEmployee =
             employeeTable.getSelectionModel().getSelectedItem();
+
         if (selectedEmployee == null) {
             DialogManager.showWarningDialog(
                 "No selection",
@@ -228,9 +295,15 @@ public class EmployeeManagementController implements Initializable {
             return;
         }
 
+        logger.info("Opening edit dialog for employee ID: {}", selectedEmployee.id());
         showEmployeeFormDialog(selectedEmployee);
     }
 
+    /**
+     * Shows the employee form dialog for adding or editing an employee
+     *
+     * @param employee The employee to edit, or null for adding a new employee
+     */
     private void showEmployeeFormDialog(EmployeeDTO employee) {
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -239,10 +312,13 @@ public class EmployeeManagementController implements Initializable {
 
             dialogStage.setTitle(employee == null ? "Add Employee" : "Edit Employee");
             dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(employeeTable.getScene().getWindow());
             dialogStage.setScene(new Scene(loader.load()));
+            dialogStage.setResizable(false);
 
             EmployeeFormController controller = loader.getController();
             if (controller == null) {
+                logger.error("EmployeeFormController is null");
                 DialogManager.showErrorDialog(
                     "Initialization Error",
                     "Form controller could not be initialized."
@@ -250,16 +326,21 @@ public class EmployeeManagementController implements Initializable {
                 return;
             }
 
+            // Injects dependencies to the form controller
             controller.setDialogStage(dialogStage);
             controller.setHrmService(this.hrmService);
 
+            // If editing, set the employee data
             if (employee != null)
                 controller.setEmployeeToEdit(employee);
 
             dialogStage.showAndWait();
 
-            if (controller.isSaved())
+            // If saved, reload the employee list
+            if (controller.isSaved()) {
+                logger.info("Employee saved successfully, reloading list...");
                 loadEmployees();
+            }
         } catch (IOException e) {
             logger.error("Failed to load employee form dialog", e);
             DialogManager.showErrorDialog(
@@ -269,8 +350,21 @@ public class EmployeeManagementController implements Initializable {
         }
     }
 
+    /**
+     * Handles the delete selected employee button action
+     */
     @FXML
     private void handleDeleteSelectedEmployee() {
+        EmployeeDTO selectedEmployee = employeeTable.getSelectionModel().getSelectedItem();
+
+        if (selectedEmployee == null) {
+            DialogManager.showWarningDialog(
+                "No Selection",
+                "Please select an employee from the table to delete."
+            );
+            return;
+        }
+
         DialogManager.showWarningDialog(
             "Not Implemented",
             "Delete functionality not yet implemented"
