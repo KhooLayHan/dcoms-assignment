@@ -4,6 +4,8 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.concurrent.ScheduledService;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -268,24 +270,65 @@ public class MainController {
      * Monitors the connection status to the server.
      */
     private void startConnectionMonitoring() {
-        updateConnectionStatus();
+        checkConnectionInBackground();
 
-        connectionCheckTimer = new Timeline(
-            new KeyFrame(Duration.seconds(30), e -> {
-                updateConnectionStatus();
-            })
-        );
-        connectionCheckTimer.setCycleCount(Animation.INDEFINITE);
-        connectionCheckTimer.play();
+        // Schedule periodic checks using ScheduledService
+        ScheduledService<Boolean> connectionCheckService = new ScheduledService<>() {
+            @Override
+            protected Task<Boolean> createTask() {
+                return new Task<>() {
+                    @Override
+                    protected Boolean call() throws Exception {
+                        // Runs on background thread – safe to block
+                        if (serviceManager == null)
+                            return false;
+
+                        return serviceManager.isConnected();
+                    }
+                };
+            }
+        };
+
+        connectionCheckService.setPeriod(Duration.seconds(30));
+
+        connectionCheckService.setOnSucceeded(event -> {
+            Boolean connected = connectionCheckService.getValue();
+            // Updates UI on the JavaFX thread
+            updateConnectionStatusUI(connected != null && connected);
+        });
+
+        connectionCheckService.setOnFailed(event -> {
+            logger.error("Connection Check Failed", connectionCheckService.getException());
+            // Assumes disconnection on failure
+            updateConnectionStatusUI(false);
+        });
+
+        connectionCheckService.start();
     }
 
     /**
-     * Updates the connection status indicator.
+     * Performs initial connection check in background
      */
-    private void updateConnectionStatus() {
-        boolean connected =
-            serviceManager != null && serviceManager.isConnected();
+    private void checkConnectionInBackground() {
+        if (executorService != null)
+            executorService.submit(() -> {
+                boolean connected = serviceManager != null && serviceManager.isConnected();
+                Platform.runLater(() -> updateConnectionStatusUI(connected));
+            });
+        else {
+            // Fallback to direct check if no executor
+            updateConnectionStatusUI(
+                serviceManager != null && serviceManager.isConnected()
+            );
+        }
+    }
 
+    /**
+     * Updates the connection status indicator on the UI thread
+     *
+     * @param connected true if connected, false otherwise
+     */
+    private void updateConnectionStatusUI(boolean connected) {
         Platform.runLater(() -> {
             if (connected) {
                 connectionStatusIcon.getStyleClass().removeAll("connection-status-disconnected");
@@ -296,7 +339,7 @@ public class MainController {
                 connectionStatusIcon.getStyleClass().add("connection-status-disconnected");
                 connectionStatusLabel.setText("Disconnected");
 
-                logger.warn("Connection to server lost");
+                logger.warn("Connection to server lost.");
             }
         });
     }

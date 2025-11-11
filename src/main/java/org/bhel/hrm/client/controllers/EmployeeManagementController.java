@@ -1,6 +1,6 @@
 package org.bhel.hrm.client.controllers;
 
-import javafx.beans.Observable;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -11,12 +11,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.bhel.hrm.client.MainClient;
 import org.bhel.hrm.client.constants.FXMLPaths;
 import org.bhel.hrm.client.services.ServiceManager;
 import org.bhel.hrm.client.utils.DialogManager;
@@ -25,11 +21,8 @@ import org.bhel.hrm.common.services.HRMService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
@@ -63,10 +56,34 @@ public class EmployeeManagementController implements Initializable {
     private ObservableList<EmployeeDTO> allEmployees;
     private ObservableList<EmployeeDTO> filteredEmployees;
 
+    private boolean initialized = false;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         logger.info("Employee Management Controller initialized.");
 
+        initializeTableColumns();
+
+        // Sets up a listener to complete initialization once the scene is available.
+        employeeTable.sceneProperty().addListener(
+            (
+            observable,
+            oldScene,
+            newScene
+            ) -> {
+                if (newScene != null && !initialized) {
+                    initialized = true;
+                    logger.info("Scene is now available, completing initialization...");
+                    completeInitialization();
+                }
+            }
+        );
+    }
+
+    /**
+     * Completes the initialization once the scene is available.
+     */
+    private void completeInitialization() {
         // Get dependencies from parent controller
         MainController mainController = getMainController();
 
@@ -80,22 +97,19 @@ public class EmployeeManagementController implements Initializable {
 
         if (hrmService == null) {
             logger.error("HRMService is null - cannot initialize employee management");
-            DialogManager.showErrorDialog(
+            Platform.runLater(() -> DialogManager.showErrorDialog(
                 "Connection Error",
                 "Could not connect to the server. Please check your connection."
-            );
+            ));
             return;
         }
 
-        initializeTableColumns();
+        if (executorService == null)
+            logger.error("ExecutorService is null – background operations may fail.");
+
         setupTableSelectionListener();
         setupSearchListener();
         loadEmployees();
-
-        editButton.disableProperty().bind(
-            employeeTable.getSelectionModel().selectedItemProperty().isNull());
-        deleteButton.disableProperty().bind(
-            employeeTable.getSelectionModel().selectedItemProperty().isNull());
     }
 
     /**
@@ -148,7 +162,7 @@ public class EmployeeManagementController implements Initializable {
     }
 
     /**
-     * Sets up the search field listener for real-time filtering
+     * Sets up the search field listener for real-time filtering.
      */
     private void setupSearchListener() {
         searchField.textProperty().addListener(
@@ -210,7 +224,10 @@ public class EmployeeManagementController implements Initializable {
             );
         });
 
-        executorService.submit(employeeManagementTask);
+        if (executorService != null)
+            executorService.submit(employeeManagementTask);
+        else
+            new Thread(employeeManagementTask).start();
     }
 
     /**
@@ -365,9 +382,54 @@ public class EmployeeManagementController implements Initializable {
             return;
         }
 
-        DialogManager.showWarningDialog(
-            "Not Implemented",
-            "Delete functionality not yet implemented"
+        // Confirm deletion
+        boolean confirmed = DialogManager.showConfirmationDialog(
+            "Confirm Deletion",
+            String.format("""
+                Are you sure you want to delete employee '%s %s' (ID: %d)?
+                This action cannot be undone.
+                """,
+                selectedEmployee.firstName(),
+                selectedEmployee.lastName(),
+                selectedEmployee.id()
+            )
         );
+
+        if (!confirmed) {
+            logger.debug("Employee deletion cancelled by user.");
+            return;
+        }
+
+        Task<Void> deleteTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                // hrmService.deleteEmployeeById(selectedEmployee.id());
+                return null;
+            }
+        };
+
+        deleteTask.setOnSucceeded(event -> {
+            logger.info("Employee deleted successfully.");
+
+            DialogManager.showInfoDialog(
+                "Success",
+                "Employee deleted successfully."
+            );
+            loadEmployees();
+        });
+
+        deleteTask.setOnFailed(event -> {
+            logger.error("Failed to delete employee ", deleteTask.getException());
+
+            DialogManager.showErrorDialog(
+                "Delete Error",
+                "Could not delete the employee. Please try again."
+            );
+
+            if (executorService != null)
+                executorService.submit(deleteTask);
+            else
+                new Thread(deleteTask).start();
+        });
     }
 }

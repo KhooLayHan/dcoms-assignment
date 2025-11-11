@@ -56,6 +56,7 @@ public class LoginController {
 
         if (!serviceManager.isConnected()) {
             errorLabel.setText("Cannot connect to the server. Please check your connection.");
+            errorLabel.setVisible(true);
             usernameField.setDisable(true);
             passwordField.setDisable(true);
         }
