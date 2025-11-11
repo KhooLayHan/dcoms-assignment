@@ -91,6 +91,11 @@
     -fx-background-color: #f8f8f8;
 }
 
+/* User's Logged In Info */
+.user-info {
+    -fx-font-weight: bold;
+}
+
 /* Connection Status Indicators */
 .connection-status-connected {
     -fx-text-fill: green;
@@ -98,6 +103,11 @@
 
 .connection-status-disconnected {
     -fx-text-fill: red;
+}
+
+/* User's Current Layout View */
+.current-view {
+    -fx-font-style: italic;
 }
 
 /* TableView Styles */
@@ -120,10 +130,19 @@
     -fx-font-weight: bold;
 }
 
+.login-subtitle {
+    -fx-text-fill: #666666;
+    -fx-font-size: 12px;
+}
+
 .login-error-label {
     -fx-text-fill: red;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
+}
+
+.login-forgot-password-hyperlink {
+    -fx-font-size: 11px;
 }
 
 /* Form Styles */
@@ -145,4 +164,27 @@
 
 .transparent-button:hover {
     -fx-background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Error Pane Styles */
+.error-pane {
+    -fx-text-fill: red;
+    -fx-font-size: 14px;
+    -fx-padding: 20px;
+    -fx-background-color: #fff3cd;
+    -fx-border-color: #ffc107;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+/* Employee Management Container */
+.employee-container {
+    -fx-padding: 20px;
+}
+
+/* Employee Form Validation Error */
+.employee-form-error {
+    -fx-font-size: 12px;
+    -fx-padding: 10 0 0 0;
 }

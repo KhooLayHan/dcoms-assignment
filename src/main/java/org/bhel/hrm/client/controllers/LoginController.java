@@ -150,7 +150,8 @@ public class LoginController {
     }
 
     private void handleFailedLogin(String message) {
-        // TODO: Add user retry and login attempts logic
+        loginAttempts++;
+
         showError(message);
     }
 

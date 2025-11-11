@@ -158,6 +158,8 @@ public class MainController {
 
     /** Helper method to create and add a styled navigation button. */
     private void addNavigationBtn(String text, Runnable action) {
+        final String NAV_BUTTON_STYLE = "nav-button-active";
+
         Button button = new Button(text);
         button.setMaxWidth(Double.MAX_VALUE);
         button.getStyleClass().add("nav-button");
@@ -165,10 +167,10 @@ public class MainController {
         button.setOnAction(e -> {
             // Removes active state from previous button
             if (activeButton != null)
-                activeButton.getStyleClass().remove("nav-button-active");
+                activeButton.getStyleClass().remove(NAV_BUTTON_STYLE);
 
             // Sets active state on current button
-            button.getStyleClass().add("nav-button-active");
+            button.getStyleClass().add(NAV_BUTTON_STYLE);
             activeButton = button;
 
             // Update current view label
@@ -185,7 +187,7 @@ public class MainController {
 
         // Sets first button as active by default
         if (activeButton == null) {
-            button.getStyleClass().add("nav-button-active");
+            button.getStyleClass().add(NAV_BUTTON_STYLE);
             activeButton = button;
         }
     }
@@ -256,11 +258,9 @@ public class MainController {
      */
     private void startClock() {
         clockTimeline = new Timeline(
-            new KeyFrame(Duration.seconds(1), e -> {
-                currentTimeLabel.setText(
-                    LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))
-                );
-            })
+            new KeyFrame(Duration.seconds(1), e -> currentTimeLabel.setText(
+                LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+            ))
         );
         clockTimeline.setCycleCount(Animation.INDEFINITE);
         clockTimeline.play();
