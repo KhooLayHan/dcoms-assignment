@@ -157,7 +157,7 @@ public class EmployeeFormController {
             }
         };
 
-        saveTask.setOnSucceeded(event -> {
+        saveTask.setOnSucceeded(event ->
             Platform.runLater(() -> {
                 isSaved = true;
 
@@ -169,73 +169,45 @@ public class EmployeeFormController {
                 );
 
                 dialogStage.close();
-            });
-        });
+            })
+        );
 
-        saveTask.setOnFailed(event -> {
+        saveTask.setOnFailed(event ->
             Platform.runLater(() -> {
                 setFormDisabled(false);
 
                 Throwable error = saveTask.getException();
                 logger.error("Failed to save employee", error);
 
-//                if switch (error) {
-                    if (error instanceof HRMException hrmEx) {
-//                    case error instanceof HRMException hrmEx -> {
+                switch (error) {
+                    case HRMException hrmEx -> {
                         logger.warn("Validation Error: {}", hrmEx.getCode());
                         showError("Validation Error: " + hrmEx.getCode());
                     }
-                    else if (error instanceof RemoteException remoteEx) {
-                    //                    case error instanceof RemoteException remoteEx -> {
+                    case RemoteException remoteEx -> {
                         logger.warn("Server error while saving employee", remoteEx);
 
                         showError("Server communication error. Please try again.");
                         DialogManager.showErrorDialog(
-                            "Server Error",
-                            "An error occurred while communicating with the server. Please try again."
+                                "Server Error",
+                                "An error occurred while communicating with the server. Please try again."
                         );
                     }
-                    else {
-//                    default -> {
+                    default -> {
                         logger.error("Unexpected error while saving employee");
                         showError("An unexpected error occurred.");
                         saveButton.setDisable(false);
 
                         DialogManager.showErrorDialog(
-                            "Error",
-                            "An unexpected error occurred. Please try again."
+                                "Error",
+                                "An unexpected error occurred. Please try again."
                         );
                     }
-
-            });
-        });
+                }
+            })
+        );
 
         new Thread(saveTask).start();
-    }
-
-    /**
-     * Updates an existing employee's profile.
-     */
-    private void updateExistingEmployee() throws HRMException, RemoteException {
-        logger.info("Updating employee ID: {}", employeeToEdit.id());
-
-        EmployeeDTO updatedDTO = new EmployeeDTO(
-            employeeToEdit.id(),
-            employeeToEdit.userId(),
-            firstNameField.getText(),
-            lastNameField.getText(),
-            icPassportField.getText()
-        );
-
-        hrmService.updateEmployeeProfile(updatedDTO);
-        logger.info("Employee updated successfully.");
-        isSaved = true;
-
-        DialogManager.showInfoDialog(
-            "Success",
-            "Employee profile updated successfully."
-        );
-        dialogStage.close();
     }
 
     /**
@@ -248,25 +220,41 @@ public class EmployeeFormController {
 
         // Validate user account fields (only for new employees)
         if (employeeToEdit == null) {
-            String username = usernameField.getText().trim();
-            String password = passwordField.getText();
-            UserDTO.Role role = roleComboBox.getValue();
-
-            if (username.isEmpty())
-                errors.append("• Username is required.\n");
-            else if (username.length() < 3)
-                errors.append("• Username must be at least 3 characters long.\n");
-
-            if (password.isEmpty())
-                errors.append("• Password is required.\n");
-            else if (password.length() < 6)
-                errors.append("• Password must be at least 6 characters long.\n");
-
-            if (role == null)
-                errors.append("• Role must be selected.\n");
+            validateUserAccount(errors);
         }
 
         // Validate employee profile fields (required for both new and edit)
+        validateProfileFields(errors);
+
+        // If there are validation errors, show them
+        if (!errors.isEmpty()) {
+            showError("Please fix the following errors: \n" + errors.toString());
+            return false;
+        }
+
+        return true;
+    }
+
+    private void validateUserAccount(StringBuilder errors) {
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText();
+        UserDTO.Role role = roleComboBox.getValue();
+
+        if (username.isEmpty())
+            errors.append("• Username is required.\n");
+        else if (username.length() < 3)
+            errors.append("• Username must be at least 3 characters long.\n");
+
+        if (password.isEmpty())
+            errors.append("• Password is required.\n");
+        else if (password.length() < 6)
+            errors.append("• Password must be at least 6 characters long.\n");
+
+        if (role == null)
+            errors.append("• Role must be selected.\n");
+    }
+
+    private void validateProfileFields(StringBuilder errors) {
         String firstName = firstNameField.getText().trim();
         String lastName = lastNameField.getText().trim();
         String icPassport = icPassportField.getText().trim();
@@ -285,14 +273,6 @@ public class EmployeeFormController {
             errors.append("• IC/Passport is required. \n");
         else if (icPassport.length() < 5)
             errors.append("• IC/Passport must be at least 5 characters long. \n");
-
-        // If there are validation errors, show them
-        if (!errors.isEmpty()) {
-            showError("Please fix the following errors: \n" + errors.toString());
-            return false;
-        }
-
-        return true;
     }
 
     /**
