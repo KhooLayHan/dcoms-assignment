@@ -1,6 +1,8 @@
 package org.bhel.hrm.server;
 
 import org.bhel.hrm.common.services.HRMService;
+import org.bhel.hrm.server.config.ApplicationContext;
+import org.bhel.hrm.server.services.HRMServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +29,7 @@ public class ServerLauncher {
        } catch (Exception e) {
             logger.error("Server exception: {}", e.toString());
             logger.error("A fatal error occurred during startup {}", e.getMessage());
-        }
+       }
     }
 
     private static HRMServer getHRMServer(ApplicationContext context) throws RemoteException {

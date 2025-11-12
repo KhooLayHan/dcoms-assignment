@@ -1,9 +1,8 @@
-package org.bhel.hrm.server;
+package org.bhel.hrm.server.config;
 
 import org.bhel.hrm.common.error.ErrorMessageProvider;
 import org.bhel.hrm.common.error.ExceptionMappingConfig;
 import org.bhel.hrm.common.utils.GlobalExceptionHandler;
-import org.bhel.hrm.server.config.Configuration;
 import org.bhel.hrm.server.daos.EmployeeDAO;
 import org.bhel.hrm.server.daos.UserDAO;
 import org.bhel.hrm.server.daos.impls.EmployeeDAOImpl;

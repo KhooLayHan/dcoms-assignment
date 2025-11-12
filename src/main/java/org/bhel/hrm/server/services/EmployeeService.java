@@ -5,7 +5,7 @@ import org.bhel.hrm.common.error.ErrorCode;
 import org.bhel.hrm.common.exceptions.HRMException;
 import org.bhel.hrm.common.exceptions.InvalidInputException;
 import org.bhel.hrm.common.exceptions.ResourceNotFoundException;
-import org.bhel.hrm.server.DatabaseManager;
+import org.bhel.hrm.server.config.DatabaseManager;
 import org.bhel.hrm.server.daos.EmployeeDAO;
 import org.bhel.hrm.server.domain.Employee;
 import org.bhel.hrm.server.mapper.EmployeeMapper;

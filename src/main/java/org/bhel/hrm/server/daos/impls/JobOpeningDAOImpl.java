@@ -1,7 +1,7 @@
 package org.bhel.hrm.server.daos.impls;
 
 import org.bhel.hrm.common.dtos.JobOpeningDTO;
-import org.bhel.hrm.server.DatabaseManager;
+import org.bhel.hrm.server.config.DatabaseManager;
 import org.bhel.hrm.server.daos.AbstractDAO;
 import org.bhel.hrm.server.daos.JobOpeningDAO;
 import org.bhel.hrm.server.domain.JobOpening;

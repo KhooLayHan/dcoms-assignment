@@ -1,7 +1,6 @@
-package org.bhel.hrm.server;
+package org.bhel.hrm.server.config;
 
 import org.bhel.hrm.common.exceptions.HRMException;
-import org.bhel.hrm.server.config.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

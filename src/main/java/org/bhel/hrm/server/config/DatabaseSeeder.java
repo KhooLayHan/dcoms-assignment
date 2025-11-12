@@ -1,4 +1,4 @@
-package org.bhel.hrm.server;
+package org.bhel.hrm.server.config;
 
 import net.datafaker.Faker;
 import org.bhel.hrm.common.dtos.UserDTO;
