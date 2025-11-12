@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.bhel.hrm.client.constants.FXMLPaths;
+import org.bhel.hrm.client.controllers.components.PageHeaderController;
 import org.bhel.hrm.client.services.ServiceManager;
 import org.bhel.hrm.client.utils.DialogManager;
 import org.bhel.hrm.common.dtos.EmployeeDTO;
@@ -50,6 +51,8 @@ public class EmployeeManagementController implements Initializable {
     @FXML private Button deleteButton;
     @FXML private Button refreshButton;
 
+    @FXML private PageHeaderController pageHeaderController;
+
     private HRMService hrmService;
     private ServiceManager serviceManager;
     private ExecutorService executorService;
@@ -62,7 +65,14 @@ public class EmployeeManagementController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         logger.info("Employee Management Controller initialized.");
 
+        // Initialize table columns immediately (doesn't require scene)
         initializeTableColumns();
+
+        // Configure page header
+        if (pageHeaderController != null) {
+            pageHeaderController.setTitle("Employee Management");
+            pageHeaderController.setSubtitle("Manage employee records and profiles");
+        }
 
         // Sets up a listener to complete initialization once the scene is available.
         employeeTable.sceneProperty().addListener(
