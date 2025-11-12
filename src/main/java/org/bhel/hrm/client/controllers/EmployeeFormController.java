@@ -137,7 +137,7 @@ public class EmployeeFormController {
                     );
 
                     hrmService.updateEmployeeProfile(employeeDTO);
-                    logger.info("Employee ID {} updated successfully", employeeSnapshot.id());
+                    logger.info("Employee ID {} updated successfully.", employeeSnapshot.id());
                 } else {
                     // Register new employee
                     NewEmployeeRegistrationDTO registrationDTO = new NewEmployeeRegistrationDTO(
@@ -150,7 +150,7 @@ public class EmployeeFormController {
                     );
 
                     hrmService.registerNewEmployee(registrationDTO);
-                    logger.info("New employee '{}' registered successfully", username);
+                    logger.info("New employee '{}' registered successfully.", username);
                 }
 
                 return null;

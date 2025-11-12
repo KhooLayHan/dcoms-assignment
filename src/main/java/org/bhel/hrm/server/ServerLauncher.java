@@ -27,7 +27,7 @@ public class ServerLauncher {
        } catch (Exception e) {
             logger.error("Server exception: {}", e.toString());
             logger.error("A fatal error occurred during startup {}", e.getMessage());
-        }
+       }
     }
 
     private static HRMServer getHRMServer(ApplicationContext context) throws RemoteException {

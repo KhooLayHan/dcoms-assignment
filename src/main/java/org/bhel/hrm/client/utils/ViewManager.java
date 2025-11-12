@@ -24,7 +24,7 @@ public class ViewManager {
     /**
      * Loads an FXML view and injects it into a parent container.
      * @param container The Pane (e.g., StackPane, BorderPane) to load the view into.
-     * @param fxmlPath The absolute path to the FXML file (e.g., "/org/bhel/hrm/client/view/HRDashboardView.fxml").
+     * @param fxmlPath The absolute path to the FXML file (e.g., "/org/bhel/hrm/client/view/EmployeeManagementController.fxml").
      */
     public static void loadView(Pane container, String fxmlPath) {
         try {

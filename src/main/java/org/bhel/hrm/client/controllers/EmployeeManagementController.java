@@ -403,6 +403,7 @@ public class EmployeeManagementController implements Initializable {
         Task<Void> deleteTask = new Task<>() {
             @Override
             protected Void call() throws Exception {
+                // TODO: Implement HRMService method to delete an employee by ID
                 // hrmService.deleteEmployeeById(selectedEmployee.id());
                 return null;
             }
