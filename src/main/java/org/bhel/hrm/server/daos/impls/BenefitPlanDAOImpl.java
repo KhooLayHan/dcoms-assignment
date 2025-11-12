@@ -1,6 +1,6 @@
 package org.bhel.hrm.server.daos.impls;
 
-import org.bhel.hrm.server.DatabaseManager;
+import org.bhel.hrm.server.config.DatabaseManager;
 import org.bhel.hrm.server.daos.AbstractDAO;
 import org.bhel.hrm.server.daos.BenefitPlanDAO;
 import org.bhel.hrm.server.domain.BenefitPlan;

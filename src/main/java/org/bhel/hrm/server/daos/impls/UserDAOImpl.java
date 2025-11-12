@@ -2,7 +2,7 @@ package org.bhel.hrm.server.daos.impls;
 
 import org.bhel.hrm.common.dtos.UserDTO;
 import org.bhel.hrm.common.exceptions.DataAccessException;
-import org.bhel.hrm.server.DatabaseManager;
+import org.bhel.hrm.server.config.DatabaseManager;
 import org.bhel.hrm.server.daos.AbstractDAO;
 import org.bhel.hrm.server.daos.UserDAO;
 import org.bhel.hrm.server.domain.User;

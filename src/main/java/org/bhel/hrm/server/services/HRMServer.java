@@ -1,12 +1,11 @@
-package org.bhel.hrm.server;
+package org.bhel.hrm.server.services;
 
 import org.bhel.hrm.common.dtos.*;
 import org.bhel.hrm.common.error.ErrorContext;
 import org.bhel.hrm.common.exceptions.HRMException;
 import org.bhel.hrm.common.services.HRMService;
 import org.bhel.hrm.common.utils.GlobalExceptionHandler;
-import org.bhel.hrm.server.services.EmployeeService;
-import org.bhel.hrm.server.services.UserService;
+import org.bhel.hrm.server.config.DatabaseManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

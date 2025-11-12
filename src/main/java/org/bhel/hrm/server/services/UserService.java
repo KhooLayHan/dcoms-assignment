@@ -6,7 +6,7 @@ import org.bhel.hrm.common.exceptions.AuthenticationException;
 import org.bhel.hrm.common.exceptions.DuplicateUserException;
 import org.bhel.hrm.common.exceptions.HRMException;
 import org.bhel.hrm.common.exceptions.UserNotFoundException;
-import org.bhel.hrm.server.DatabaseManager;
+import org.bhel.hrm.server.config.DatabaseManager;
 import org.bhel.hrm.server.daos.EmployeeDAO;
 import org.bhel.hrm.server.daos.UserDAO;
 import org.bhel.hrm.server.domain.Employee;
