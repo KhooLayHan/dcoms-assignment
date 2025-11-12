@@ -141,7 +141,7 @@ public class MainController {
 
         // Role-based navigation
         if (currentUser.role() == UserDTO.Role.HR_STAFF) {
-            addNavigationBtn("Employees", this::loadEmployeeManagementView);
+            addNavigationBtn("Employee Management", this::loadEmployeeManagementView);
             addNavigationBtn("Recruitment", this::loadRecruitmentView);
             addNavigationBtn("Training Admin", this::loadTrainingAdminView);
         }
@@ -150,9 +150,10 @@ public class MainController {
             currentUser.role() == UserDTO.Role.EMPLOYEE ||
             currentUser.role() == UserDTO.Role.HR_STAFF
         ) {
-            addNavigationBtn("My Profile", this::loadProfileView);
-            addNavigationBtn("Leave Applications", this::loadLeaveApplicationsView);
+            addNavigationBtn("Leave", this::loadLeaveView);
+            addNavigationBtn("Benefits", this::loadBenefitsView);
             addNavigationBtn("Training Catalog", this::loadTrainingCatalogView);
+            addNavigationBtn("My Profile", this::loadProfileView);
         }
     }
 
@@ -208,7 +209,7 @@ public class MainController {
     }
 
     /**
-     * Loads the employee management view
+     * Loads the employee management view.
      */
     private void loadEmployeeManagementView() {
         logger.info("Loading Employee Management View...");
@@ -218,39 +219,46 @@ public class MainController {
     }
 
     /**
-     * Loads the recruitment view
+     * Loads the leave view.
+     */
+    private void loadLeaveView() {
+        logger.info("Loading Leave View...");
+    }
+
+    /**
+     * Loads the benefits view.
+     */
+    private void loadBenefitsView() {
+        logger.info("Loading Benefits View...");
+    }
+
+    /**
+     * Loads the recruitment view.
      */
     private void loadRecruitmentView() {
         logger.info("Loading Recruitment View...");
     }
 
     /**
-     * Loads the training admin view
+     * Loads the training admin view.
      */
     private void loadTrainingAdminView() {
         logger.info("Loading Training Admin View...");
     }
 
     /**
-     * Loads the profile view
+     * Loads the training catalog view.
+     */
+    private void loadTrainingCatalogView() {
+        logger.info("Loading Training Catalog View...");
+    }
+
+    /**
+     * Loads the profile view.
      */
     private void loadProfileView() {
         logger.info("Loading Profile View...");
 
-    }
-
-    /**
-     * Loads the leave applications view
-     */
-    private void loadLeaveApplicationsView() {
-        logger.info("Loading Leave Applications View...");
-    }
-
-    /**
-     * Loads the training catalog view
-     */
-    private void loadTrainingCatalogView() {
-        logger.info("Loading Training Catalog View...");
     }
 
     /**
