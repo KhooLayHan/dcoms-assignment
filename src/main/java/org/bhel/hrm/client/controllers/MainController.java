@@ -223,6 +223,9 @@ public class MainController {
      */
     private void loadLeaveView() {
         logger.info("Loading Leave View...");
+
+        ViewManager.loadView(contentArea,
+            FXMLPaths.LEAVE);
     }
 
     /**
@@ -230,6 +233,9 @@ public class MainController {
      */
     private void loadBenefitsView() {
         logger.info("Loading Benefits View...");
+
+        ViewManager.loadView(contentArea,
+            FXMLPaths.BENEFITS);
     }
 
     /**
@@ -237,6 +243,9 @@ public class MainController {
      */
     private void loadRecruitmentView() {
         logger.info("Loading Recruitment View...");
+
+        ViewManager.loadView(contentArea,
+            FXMLPaths.RECRUITMENT);
     }
 
     /**
@@ -244,6 +253,9 @@ public class MainController {
      */
     private void loadTrainingAdminView() {
         logger.info("Loading Training Admin View...");
+
+        ViewManager.loadView(contentArea,
+            FXMLPaths.TRAINING_ADMIN);
     }
 
     /**
@@ -251,6 +263,9 @@ public class MainController {
      */
     private void loadTrainingCatalogView() {
         logger.info("Loading Training Catalog View...");
+
+        ViewManager.loadView(contentArea,
+            FXMLPaths.TRAINING_CATALOG);
     }
 
     /**
@@ -258,7 +273,6 @@ public class MainController {
      */
     private void loadProfileView() {
         logger.info("Loading Profile View...");
-
     }
 
     /**
