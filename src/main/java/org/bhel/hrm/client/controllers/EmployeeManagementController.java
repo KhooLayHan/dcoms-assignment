@@ -425,11 +425,11 @@ public class EmployeeManagementController implements Initializable {
                 "Delete Error",
                 "Could not delete the employee. Please try again."
             );
-
-            if (executorService != null)
-                executorService.submit(deleteTask);
-            else
-                new Thread(deleteTask).start();
         });
+
+        if (executorService != null)
+            executorService.submit(deleteTask);
+        else
+            new Thread(deleteTask).start();
     }
 }

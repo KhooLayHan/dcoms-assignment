@@ -1,5 +1,7 @@
 package org.bhel.hrm.client.controllers;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -30,6 +32,7 @@ public class EmployeeFormController {
     @FXML private TextField icPassportField;
     @FXML private Label errorLabel;
     @FXML private Button saveButton;
+    @FXML private Button cancelButton;
 
     private HRMService hrmService;
     private Stage dialogStage;
@@ -103,63 +106,111 @@ public class EmployeeFormController {
         if (!validateInput())
             return;
 
-        // Disables save button to prevent double submission
-        saveButton.setDisable(true);
+        // Capture field values before starting background tasks
+        final String username = usernameField.getText().trim();
+        final String password = passwordField.getText().trim();
+        final UserDTO.Role role = roleComboBox.getValue();
+
+        final String firstName = firstNameField.getText().trim();
+        final String lastName = lastNameField.getText().trim();
+        final String icPassport = icPassportField.getText().trim();
+
+        final boolean isEditMode = employeeToEdit != null;
+        final EmployeeDTO employeeSnapshot = employeeToEdit; // Capture reference
+
+        // Disable UI controls while saving
+        setFormDisabled(true);
         errorLabel.setVisible(false);
 
-        try {
-            if (employeeToEdit == null)
-                saveNewEmployee();
-            else
-                updateExistingEmployee();
-        } catch (HRMException e) {
-            logger.warn("Validation Error: {}", e.getCode());
-            showError("Validation Error: " + e.getCode());
-            saveButton.setDisable(false);
-        } catch (RemoteException e) {
-            logger.error("Server error while saving employee.", e);
-            showError("Server error occurred. Please try again.");
-            saveButton.setDisable(false);
+        // Create background task for the save operation
+        Task<Void> saveTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                if (isEditMode) {
+                    // Update existing employee
+                    EmployeeDTO employeeDTO = new EmployeeDTO(
+                        employeeSnapshot.id(),
+                        employeeSnapshot.userId(),
+                        firstName,
+                        lastName,
+                        icPassport
+                    );
 
-            DialogManager.showErrorDialog(
-                "Server Error",
-                "An error occurred while communicating with the server. Please try again."
-            );
-        } catch (Exception e) {
-            logger.error("Unexpected error while saving employee", e);
-            showError("An unexpected error occurred.");
-            saveButton.setDisable(false);
+                    hrmService.updateEmployeeProfile(employeeDTO);
+                    logger.info("Employee ID {} updated successfully", employeeSnapshot.id());
+                } else {
+                    // Register new employee
+                    NewEmployeeRegistrationDTO registrationDTO = new NewEmployeeRegistrationDTO(
+                        username,
+                        password,
+                        role,
+                        firstName,
+                        lastName,
+                        icPassport
+                    );
 
-            DialogManager.showErrorDialog(
-                "Error",
-                "An unexpected error occurred. Please try again."
-            );
-        }
-    }
+                    hrmService.registerNewEmployee(registrationDTO);
+                    logger.info("New employee '{}' registered successfully", username);
+                }
 
-    /**
-     * Saves a new employee to the system.
-     */
-    private void saveNewEmployee() throws RemoteException, HRMException {
-        logger.info("Saving new employee...");
+                return null;
+            }
+        };
 
-        NewEmployeeRegistrationDTO registrationDTO = new NewEmployeeRegistrationDTO(
-            usernameField.getText(),
-            passwordField.getText(),
-            roleComboBox.getValue(),
-            firstNameField.getText(),
-            lastNameField.getText(),
-            icPassportField.getText()
-        );
+        saveTask.setOnSucceeded(event -> {
+            Platform.runLater(() -> {
+                isSaved = true;
 
-        hrmService.registerNewEmployee(registrationDTO);
-        isSaved = true;
+                DialogManager.showInfoDialog(
+                    "Success",
+                    isEditMode
+                        ? "Employee profile updated successfully."
+                        : "Employee registered successfully."
+                );
 
-        DialogManager.showInfoDialog(
-            "Success",
-            "Employee registered successfully."
-        );
-        dialogStage.close();
+                dialogStage.close();
+            });
+        });
+
+        saveTask.setOnFailed(event -> {
+            Platform.runLater(() -> {
+                setFormDisabled(false);
+
+                Throwable error = saveTask.getException();
+                logger.error("Failed to save employee", error);
+
+//                if switch (error) {
+                    if (error instanceof HRMException hrmEx) {
+//                    case error instanceof HRMException hrmEx -> {
+                        logger.warn("Validation Error: {}", hrmEx.getCode());
+                        showError("Validation Error: " + hrmEx.getCode());
+                    }
+                    else if (error instanceof RemoteException remoteEx) {
+                    //                    case error instanceof RemoteException remoteEx -> {
+                        logger.warn("Server error while saving employee", remoteEx);
+
+                        showError("Server communication error. Please try again.");
+                        DialogManager.showErrorDialog(
+                            "Server Error",
+                            "An error occurred while communicating with the server. Please try again."
+                        );
+                    }
+                    else {
+//                    default -> {
+                        logger.error("Unexpected error while saving employee");
+                        showError("An unexpected error occurred.");
+                        saveButton.setDisable(false);
+
+                        DialogManager.showErrorDialog(
+                            "Error",
+                            "An unexpected error occurred. Please try again."
+                        );
+                    }
+
+            });
+        });
+
+        new Thread(saveTask).start();
     }
 
     /**
@@ -250,6 +301,21 @@ public class EmployeeFormController {
     private void showError(String message) {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
+    }
+
+    /**
+     * Enables or disables all form controls.
+     */
+    private void setFormDisabled(boolean disabled) {
+        usernameField.setDisable(disabled || employeeToEdit != null);
+        passwordField.setDisable(disabled || employeeToEdit != null);
+        roleComboBox.setDisable(disabled || employeeToEdit != null);
+
+        firstNameField.setDisable(disabled);
+        lastNameField.setDisable(disabled);
+        icPassportField.setDisable(disabled);
+        saveButton.setDisable(disabled);
+        cancelButton.setDisable(disabled);
     }
 
     /**
