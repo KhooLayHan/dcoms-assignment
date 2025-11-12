@@ -189,8 +189,8 @@ public class EmployeeFormController {
 
                         showError("Server communication error. Please try again.");
                         DialogManager.showErrorDialog(
-                                "Server Error",
-                                "An error occurred while communicating with the server. Please try again."
+                            "Server Error",
+                            "An error occurred while communicating with the server. Please try again."
                         );
                     }
                     default -> {
@@ -199,8 +199,8 @@ public class EmployeeFormController {
                         saveButton.setDisable(false);
 
                         DialogManager.showErrorDialog(
-                                "Error",
-                                "An unexpected error occurred. Please try again."
+                            "Error",
+                            "An unexpected error occurred. Please try again."
                         );
                     }
                 }
